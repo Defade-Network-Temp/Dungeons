@@ -1,0 +1,5 @@
+{
+  "entrypoint": "net.defade.dungeons.Main",
+  "name": "Dungeons",
+  "version": "1.0.0"
+}
