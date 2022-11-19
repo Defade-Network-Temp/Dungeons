@@ -1,6 +1,9 @@
 package net.defade.dungeons.game.utils;
 
+import net.defade.dungeons.difficulty.DifficultyVote;
 import net.defade.dungeons.game.GameInstance;
+import net.defade.dungeons.gui.DifficultySelectorGUI;
+import net.defade.dungeons.utils.ItemList;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -8,10 +11,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
+import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
@@ -26,6 +32,7 @@ public class GameStartCountdownTask implements Runnable {
     );
 
     private final GameInstance gameInstance;
+    private final DifficultyVote difficultyVote = new DifficultyVote();
     private final Task task;
     private final EventNode<PlayerEvent> taskEvents;
 
@@ -42,13 +49,18 @@ public class GameStartCountdownTask implements Runnable {
         gameInstance.getGameEvents().getPlayerEventNode().addChild(taskEvents);
 
         taskEvents.addListener(PlayerSpawnEvent.class, playerSpawnEvent -> {
+            Player player = playerSpawnEvent.getPlayer();
+
             gameInstance.sendMessage(
                     Component.text("☠").color(TextColor.color(170, 0, 0))
                             .append(Component.text(" | ").color(TextColor.color(107, 107, 107)))
-                            .append(playerSpawnEvent.getPlayer().getName()
+                            .append(player.getName()
                             .append(Component.text(" a rejoint la partie. ")).color(TextColor.color(255, 250, 0)))
                             .append(Component.text("(" + gameInstance.getPlayers().size() + "/4)").color(TextColor.color(157, 157, 157)))
             );
+
+            player.setGameMode(GameMode.ADVENTURE);
+            player.getInventory().setItemStack(8, ItemList.DIFFICULTY_SELECTOR.withAmount(12));
         });
 
         taskEvents.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> {
@@ -59,6 +71,12 @@ public class GameStartCountdownTask implements Runnable {
                             .append(Component.text(" a quitté la partie. ")).color(TextColor.color(255, 250, 0)))
                             .append(Component.text("(" + (gameInstance.getPlayers().size() - 1) + "/4)").color(TextColor.color(157, 157, 157)))
             );
+        });
+
+        taskEvents.addListener(PlayerUseItemEvent.class, playerUseItemEvent -> {
+            if(playerUseItemEvent.getItemStack().isSimilar(ItemList.DIFFICULTY_SELECTOR)) {
+                playerUseItemEvent.getPlayer().openInventory(new DifficultySelectorGUI(difficultyVote));
+            }
         });
     }
 
@@ -105,7 +123,7 @@ public class GameStartCountdownTask implements Runnable {
                     gameInstance.playSound(Sound.sound(Key.key("minecraft:block.note_block.hat"), Sound.Source.BLOCK, 1, 1));
                 }
                 case 0 -> {
-                    gameInstance.start();
+                    gameInstance.start(difficultyVote.getVotedDifficulty());
                     task.cancel();
                     gameInstance.getGameEvents().getPlayerEventNode().removeChild(taskEvents);
                 }

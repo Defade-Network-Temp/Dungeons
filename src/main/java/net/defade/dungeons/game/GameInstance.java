@@ -1,5 +1,6 @@
 package net.defade.dungeons.game;
 
+import net.defade.dungeons.difficulty.Difficulty;
 import net.defade.dungeons.game.config.GameConfig;
 import net.defade.dungeons.game.utils.GameEvents;
 import net.defade.dungeons.game.utils.GameStartCountdownTask;
@@ -69,7 +70,8 @@ public class GameInstance extends InstanceContainer {
         gameManager.unregisterGame(this);
     }
 
-    public void start() {
+    public void start(Difficulty difficulty) {
+        System.out.println(difficulty);
         setAcceptsPlayers(false);
     }
 
