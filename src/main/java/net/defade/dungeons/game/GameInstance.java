@@ -37,7 +37,7 @@ public class GameInstance extends InstanceContainer {
         this.gameManager = gameManager;
 
         AmethystChunkLoader chunkLoader = new AmethystChunkLoader(new AmethystMapSource());
-        this.config = chunkLoader.getConfig();
+        this.config = new GameConfig(chunkLoader.getConfig());
 
         setChunkLoader(chunkLoader);
         chunkLoader.loadInstance(this);
@@ -75,5 +75,9 @@ public class GameInstance extends InstanceContainer {
 
     public BossBar getBossBar() {
         return bossBar;
+    }
+
+    public GameEvents getGameEvents() {
+        return gameEvents;
     }
 }

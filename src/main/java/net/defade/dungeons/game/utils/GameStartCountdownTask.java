@@ -8,6 +8,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
+import net.minestom.server.event.EventFilter;
+import net.minestom.server.event.EventNode;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
+import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import java.time.Duration;
@@ -22,6 +27,7 @@ public class GameStartCountdownTask implements Runnable {
 
     private final GameInstance gameInstance;
     private final Task task;
+    private final EventNode<PlayerEvent> taskEvents;
 
     private int timer = Integer.MAX_VALUE;
     private int oldPlayerCount = 0;
@@ -31,6 +37,29 @@ public class GameStartCountdownTask implements Runnable {
     public GameStartCountdownTask(GameInstance gameInstance) {
         this.gameInstance = gameInstance;
         this.task = gameInstance.scheduler().scheduleTask(this, TaskSchedule.immediate(), TaskSchedule.tick(1));
+
+        taskEvents = EventNode.type("countdown-events", EventFilter.PLAYER);
+        gameInstance.getGameEvents().getPlayerEventNode().addChild(taskEvents);
+
+        taskEvents.addListener(PlayerSpawnEvent.class, playerSpawnEvent -> {
+            gameInstance.sendMessage(
+                    Component.text("☠").color(TextColor.color(170, 0, 0))
+                            .append(Component.text(" | ").color(TextColor.color(107, 107, 107)))
+                            .append(playerSpawnEvent.getPlayer().getName()
+                            .append(Component.text(" a rejoint la partie. ")).color(TextColor.color(255, 250, 0)))
+                            .append(Component.text("(" + gameInstance.getPlayers().size() + "/4)").color(TextColor.color(157, 157, 157)))
+            );
+        });
+
+        taskEvents.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> {
+            gameInstance.sendMessage(
+                    Component.text("☠").color(TextColor.color(170, 0, 0))
+                            .append(Component.text(" | ").color(TextColor.color(107, 107, 107)))
+                            .append(playerDisconnectEvent.getPlayer().getName()
+                            .append(Component.text(" a quitté la partie. ")).color(TextColor.color(255, 250, 0)))
+                            .append(Component.text("(" + (gameInstance.getPlayers().size() - 1) + "/4)").color(TextColor.color(157, 157, 157)))
+            );
+        });
     }
 
     @Override
@@ -39,6 +68,7 @@ public class GameStartCountdownTask implements Runnable {
         if(connectedPlayers <= 1) {
             gameInstance.getBossBar().name(Component.text("En attente de joueurs... ").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD));
             gameInstance.getBossBar().progress(0f);
+            timer = Integer.MAX_VALUE;
             return;
         }
 
@@ -56,7 +86,7 @@ public class GameStartCountdownTask implements Runnable {
 
             gameInstance.getBossBar().name(Component.text("Démarrage... ").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)
                     .append(Component.text("(").color(NamedTextColor.GRAY))
-                    .append(Component.text(timer + " secondes").color(NamedTextColor.WHITE))
+                    .append(Component.text(timer + "s").color(NamedTextColor.WHITE))
                     .append(Component.text(")").color(NamedTextColor.GRAY))
             );
 
@@ -66,7 +96,7 @@ public class GameStartCountdownTask implements Runnable {
                             Component.text("» ").color(TextColor.color(NamedTextColor.GRAY))
                                     .append(Component.text("La partie commence dans ").color(TextColor.color(255, 255, 75)))
                                     .append(Component.text(timer).color(TextColor.color(250, 65, 65)))
-                                    .append(Component.text(" secondes.").color(TextColor.color(255, 255, 75)))
+                                    .append(Component.text(" secondes.").color(TextColor.color(255, 255, 75)).decoration(TextDecoration.BOLD, false))
                     );
 
                     Title.Times times = Title.Times.times(Duration.ofMillis(100), Duration.ofMillis(1500), Duration.ofMillis(100));
@@ -77,6 +107,7 @@ public class GameStartCountdownTask implements Runnable {
                 case 0 -> {
                     gameInstance.start();
                     task.cancel();
+                    gameInstance.getGameEvents().getPlayerEventNode().removeChild(taskEvents);
                 }
             }
         }
