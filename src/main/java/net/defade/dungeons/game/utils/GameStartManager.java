@@ -57,7 +57,7 @@ public class GameStartManager implements Runnable {
             );
 
             player.setGameMode(GameMode.ADVENTURE);
-            player.getInventory().setItemStack(8, ItemList.DIFFICULTY_SELECTOR.withAmount(12));
+            player.getInventory().setItemStack(8, ItemList.DIFFICULTY_SELECTOR.withAmount(1));
         });
 
         gameEvents.getPlayerEventNode().addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> {

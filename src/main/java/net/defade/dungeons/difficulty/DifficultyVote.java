@@ -4,6 +4,7 @@ import net.minestom.server.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DifficultyVote {
     private final Map<Player, Difficulty> votes = new HashMap<>();
@@ -26,6 +27,6 @@ public class DifficultyVote {
             }
         }
 
-        return votedDifficulty;
+        return votedDifficulty == null ? Difficulty.values()[ThreadLocalRandom.current().nextInt(0, Difficulty.values().length)] : votedDifficulty;
     }
 }
