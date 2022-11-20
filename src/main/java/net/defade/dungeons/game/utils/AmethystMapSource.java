@@ -1,4 +1,4 @@
-package net.defade.dungeons.game;
+package net.defade.dungeons.game.utils;
 
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
