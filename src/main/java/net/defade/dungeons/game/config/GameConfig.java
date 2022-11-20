@@ -1,32 +1,38 @@
 package net.defade.dungeons.game.config;
 
+import net.defade.dungeons.difficulty.Difficulty;
 import net.minestom.server.coordinate.Pos;
 import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameConfig {
+    private final JSONObject jsonConfig;
     private final Pos spawnPoint;
 
-    private final double spawnMultiplier;
-    private final WaveConfig waveConfig;
+    private final Map<Difficulty, Double> spawnMultiplier = new HashMap<>();
 
     public GameConfig(String config) {
-        JSONObject jsonConfig = new JSONObject(config);
+        jsonConfig = new JSONObject(config);
 
         spawnPoint = getPos(jsonConfig.getJSONObject("spawn"));
-        spawnMultiplier = jsonConfig.getDouble("SpawnMultiplier");
-        waveConfig = new WaveConfig(jsonConfig.getJSONArray("waves"), spawnMultiplier);
+
+        JSONObject spawnMultiplierObject = jsonConfig.getJSONObject("SpawnMultiplier");
+        for(Difficulty difficulty : Difficulty.values()) {
+            spawnMultiplier.put(difficulty, spawnMultiplierObject.getDouble(difficulty.toString()));
+        }
     }
 
     public Pos getSpawnPoint() {
         return spawnPoint;
     }
 
-    public double getSpawnMultiplier() {
-        return spawnMultiplier;
+    public double getSpawnMultiplier(Difficulty difficulty) {
+        return spawnMultiplier.get(difficulty);
     }
 
-    public WaveConfig getWaveConfig() {
-        return waveConfig;
+    public WaveConfig getWaveConfig(Difficulty difficulty) {
+        return new WaveConfig(jsonConfig.getJSONArray("waves"), getSpawnMultiplier(difficulty));
     }
 
     private static Pos getPos(JSONObject jsonObject) {
