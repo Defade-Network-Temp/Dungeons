@@ -93,7 +93,6 @@ public class WaveManager implements Runnable {
 
     private void spawnZombie() {
         DungeonsEntity entity = waves.get(currentWave).getZombie();
-        entity.remove();
         spawnedZombies.add(entity);
         entity.setInstance(gameInstance, gameInstance.getConfig().getSpawnPoint()); // TODO change the spawn point
         updateBossBar();
