@@ -10,7 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
-import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import java.time.Duration;
@@ -27,7 +27,7 @@ public class WaveManager implements Runnable {
     private final List<Wave> waves;
     private int currentWave = 0;
 
-    private final List<Entity> spawnedZombies = new ArrayList<>();
+    private final List<EntityCreature> spawnedZombies = new ArrayList<>();
     private final GameEvents eventNode;
 
     private int timer = 6;
@@ -92,7 +92,7 @@ public class WaveManager implements Runnable {
     }
 
     private void spawnZombie() {
-        Entity entity = waves.get(currentWave).getZombie();
+        EntityCreature entity = waves.get(currentWave).getZombie();
         entity.remove();
         spawnedZombies.add(entity);
         entity.setInstance(gameInstance, gameInstance.getConfig().getSpawnPoint()); // TODO change the spawn point

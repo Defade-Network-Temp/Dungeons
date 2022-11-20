@@ -1,7 +1,6 @@
 package net.defade.dungeons.game.config;
 
 import net.defade.dungeons.waves.Wave;
-import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityCreature;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,9 +16,9 @@ public class WaveConfig {
         for(int index = 0; index < wavesArray.length(); index++) {
             JSONObject waveObject = wavesArray.getJSONObject(index);
 
-            List<Class<? extends Entity>> zombiesToSpawn = new ArrayList<>();
+            List<Class<? extends EntityCreature>> zombiesToSpawn = new ArrayList<>();
             for (String zombie : waveObject.keySet()) {
-                Class<? extends Entity> zombieClass = parseZombie(zombie);
+                Class<? extends EntityCreature> zombieClass = parseZombie(zombie);
                 for(int zombiesAmount = (int) Math.ceil(waveObject.getInt(zombie) * spawnMultiplier); zombiesAmount > 0; zombiesAmount--) {
                     zombiesToSpawn.add(zombieClass);
                 }
@@ -35,10 +34,9 @@ public class WaveConfig {
         return waves;
     }
 
-    private static Class<? extends Entity> parseZombie(String zombieName) {
+    private static Class<? extends EntityCreature> parseZombie(String zombieName) {
         return switch (zombieName.toLowerCase()) {
-            case "level1" -> Entity.class;
-            case "level2" -> EntityCreature.class;
+            case "level1" -> EntityCreature.class;
             default -> throw new IllegalArgumentException("The zombie " + zombieName + " does not exists.");
         };
     }
