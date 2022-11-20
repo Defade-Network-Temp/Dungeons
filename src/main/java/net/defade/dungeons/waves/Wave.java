@@ -1,22 +1,22 @@
 package net.defade.dungeons.waves;
 
-import net.minestom.server.entity.EntityCreature;
+import net.defade.dungeons.zombies.DungeonsEntity;
+import net.defade.dungeons.zombies.classic.ZombieI;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 public class Wave {
-    private final List<Class<? extends EntityCreature>> zombiesToSpawn;
-    private final int totalZombies;
+    private final List<Class<? extends DungeonsEntity>> zombiesToSpawn;
 
-    public Wave(List<Class<? extends EntityCreature>> zombiesToSpawn) {
+    public Wave(List<Class<? extends DungeonsEntity>> zombiesToSpawn) {
         this.zombiesToSpawn = zombiesToSpawn;
-        this.totalZombies = zombiesToSpawn.size();
     }
 
-    public EntityCreature getZombie() {
-        Class<? extends EntityCreature> zombieClass = zombiesToSpawn.remove(0);
+    public DungeonsEntity getZombie() {
+        Class<? extends DungeonsEntity> zombieClass = zombiesToSpawn.remove(0);
 
+        if(zombieClass == ZombieI.class) return new ZombieI();
         throw new NoSuchElementException("The class " + zombieClass.getCanonicalName() + " has no supplier.");
     }
 

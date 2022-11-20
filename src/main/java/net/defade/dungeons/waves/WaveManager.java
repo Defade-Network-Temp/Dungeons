@@ -2,6 +2,7 @@ package net.defade.dungeons.waves;
 
 import net.defade.dungeons.game.GameInstance;
 import net.defade.dungeons.utils.GameEvents;
+import net.defade.dungeons.zombies.DungeonsEntity;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -10,7 +11,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
-import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import java.time.Duration;
@@ -27,7 +27,7 @@ public class WaveManager implements Runnable {
     private final List<Wave> waves;
     private int currentWave = 0;
 
-    private final List<EntityCreature> spawnedZombies = new ArrayList<>();
+    private final List<DungeonsEntity> spawnedZombies = new ArrayList<>();
     private final GameEvents eventNode;
 
     private int timer = 6;
@@ -92,7 +92,7 @@ public class WaveManager implements Runnable {
     }
 
     private void spawnZombie() {
-        EntityCreature entity = waves.get(currentWave).getZombie();
+        DungeonsEntity entity = waves.get(currentWave).getZombie();
         entity.remove();
         spawnedZombies.add(entity);
         entity.setInstance(gameInstance, gameInstance.getConfig().getSpawnPoint()); // TODO change the spawn point
