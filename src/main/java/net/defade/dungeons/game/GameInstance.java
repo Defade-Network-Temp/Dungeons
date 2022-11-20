@@ -2,8 +2,9 @@ package net.defade.dungeons.game;
 
 import net.defade.dungeons.difficulty.Difficulty;
 import net.defade.dungeons.game.config.GameConfig;
-import net.defade.dungeons.game.utils.GameEvents;
-import net.defade.dungeons.game.utils.GameStartCountdownTask;
+import net.defade.dungeons.game.utils.AmethystMapSource;
+import net.defade.dungeons.utils.GameEvents;
+import net.defade.dungeons.game.utils.GameStartManager;
 import net.defade.yokura.amethyst.AmethystChunkLoader;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -55,7 +56,7 @@ public class GameInstance extends InstanceContainer {
             player.showBossBar(bossBar);
         });
 
-        new GameStartCountdownTask(this);
+        new GameStartManager(this);
     }
 
     public boolean canAcceptPlayers() {
@@ -71,7 +72,6 @@ public class GameInstance extends InstanceContainer {
     }
 
     public void start(Difficulty difficulty) {
-        System.out.println(difficulty);
         setAcceptsPlayers(false);
     }
 

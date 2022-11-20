@@ -24,7 +24,7 @@ import net.minestom.server.timer.TaskSchedule;
 import java.time.Duration;
 import java.util.Map;
 
-public class GameStartCountdownTask implements Runnable {
+public class GameStartManager implements Runnable {
     private static final Map<Integer, Integer> PLAYER_COUNT_TIMER = Map.ofEntries(
             Map.entry(2, 10), //TODO set to 60
             Map.entry(3, 30),
@@ -41,7 +41,7 @@ public class GameStartCountdownTask implements Runnable {
 
     private int ticks = 0;
 
-    public GameStartCountdownTask(GameInstance gameInstance) {
+    public GameStartManager(GameInstance gameInstance) {
         this.gameInstance = gameInstance;
         this.task = gameInstance.scheduler().scheduleTask(this, TaskSchedule.immediate(), TaskSchedule.tick(1));
 

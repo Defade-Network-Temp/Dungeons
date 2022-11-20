@@ -1,4 +1,4 @@
-package net.defade.dungeons.game.utils;
+package net.defade.dungeons.utils;
 
 import net.defade.dungeons.game.GameInstance;
 import net.minestom.server.MinecraftServer;
