@@ -5,6 +5,7 @@ import net.defade.dungeons.game.config.GameConfig;
 import net.defade.dungeons.game.utils.AmethystMapSource;
 import net.defade.dungeons.utils.GameEvents;
 import net.defade.dungeons.game.utils.GameStartManager;
+import net.defade.dungeons.waves.WaveManager;
 import net.defade.yokura.amethyst.AmethystChunkLoader;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -24,6 +25,8 @@ public class GameInstance extends InstanceContainer {
     private boolean acceptsPlayers = true; // If the game can receive new players
 
     private final GameEvents gameEvents = new GameEvents(this, MinecraftServer.getGlobalEventHandler());
+
+    private Difficulty difficulty;
 
     private final BossBar bossBar = BossBar.bossBar(
             Component.text("Démarrage... ").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)
@@ -74,6 +77,8 @@ public class GameInstance extends InstanceContainer {
 
     public void start(Difficulty difficulty) {
         setAcceptsPlayers(false);
+        this.difficulty = difficulty;
+        new WaveManager(this, config.getWaveConfig(difficulty).getWaves());
     }
 
     public BossBar getBossBar() {
@@ -82,5 +87,13 @@ public class GameInstance extends InstanceContainer {
 
     public GameEvents getGameEvents() {
         return gameEvents;
+    }
+
+    public GameConfig getConfig() {
+        return config;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
     }
 }
