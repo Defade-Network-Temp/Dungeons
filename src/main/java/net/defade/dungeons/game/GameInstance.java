@@ -10,6 +10,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.InstanceContainer;
@@ -22,7 +23,7 @@ public class GameInstance extends InstanceContainer {
     private final GameConfig config;
     private boolean acceptsPlayers = true; // If the game can receive new players
 
-    private final GameEvents gameEvents = new GameEvents(this);
+    private final GameEvents gameEvents = new GameEvents(this, MinecraftServer.getGlobalEventHandler());
 
     private final BossBar bossBar = BossBar.bossBar(
             Component.text("Démarrage... ").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)

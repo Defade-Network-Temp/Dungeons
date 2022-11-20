@@ -3,6 +3,7 @@ package net.defade.dungeons.game.utils;
 import net.defade.dungeons.difficulty.DifficultyVote;
 import net.defade.dungeons.game.GameInstance;
 import net.defade.dungeons.gui.DifficultySelectorGUI;
+import net.defade.dungeons.utils.GameEvents;
 import net.defade.dungeons.utils.ItemList;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -13,12 +14,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
-import net.minestom.server.event.EventFilter;
-import net.minestom.server.event.EventNode;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
-import net.minestom.server.event.trait.PlayerEvent;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import java.time.Duration;
@@ -34,7 +32,7 @@ public class GameStartManager implements Runnable {
     private final GameInstance gameInstance;
     private final DifficultyVote difficultyVote = new DifficultyVote();
     private final Task task;
-    private final EventNode<PlayerEvent> taskEvents;
+    private final GameEvents gameEvents;
 
     private int timer = Integer.MAX_VALUE;
     private int oldPlayerCount = 0;
@@ -45,10 +43,9 @@ public class GameStartManager implements Runnable {
         this.gameInstance = gameInstance;
         this.task = gameInstance.scheduler().scheduleTask(this, TaskSchedule.immediate(), TaskSchedule.tick(1));
 
-        taskEvents = EventNode.type("countdown-events", EventFilter.PLAYER);
-        gameInstance.getGameEvents().getPlayerEventNode().addChild(taskEvents);
+        this.gameEvents = new GameEvents(gameInstance, gameInstance.getGameEvents().getGlobalEventNode());
 
-        taskEvents.addListener(PlayerSpawnEvent.class, playerSpawnEvent -> {
+        gameEvents.getPlayerEventNode().addListener(PlayerSpawnEvent.class, playerSpawnEvent -> {
             Player player = playerSpawnEvent.getPlayer();
 
             gameInstance.sendMessage(
@@ -63,7 +60,7 @@ public class GameStartManager implements Runnable {
             player.getInventory().setItemStack(8, ItemList.DIFFICULTY_SELECTOR.withAmount(12));
         });
 
-        taskEvents.addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> {
+        gameEvents.getPlayerEventNode().addListener(PlayerDisconnectEvent.class, playerDisconnectEvent -> {
             gameInstance.sendMessage(
                     Component.text("☠").color(TextColor.color(170, 0, 0))
                             .append(Component.text(" | ").color(TextColor.color(107, 107, 107)))
@@ -73,7 +70,7 @@ public class GameStartManager implements Runnable {
             );
         });
 
-        taskEvents.addListener(PlayerUseItemEvent.class, playerUseItemEvent -> {
+        gameEvents.getPlayerEventNode().addListener(PlayerUseItemEvent.class, playerUseItemEvent -> {
             if(playerUseItemEvent.getItemStack().isSimilar(ItemList.DIFFICULTY_SELECTOR)) {
                 playerUseItemEvent.getPlayer().openInventory(new DifficultySelectorGUI(difficultyVote));
             }
@@ -125,7 +122,7 @@ public class GameStartManager implements Runnable {
                 case 0 -> {
                     gameInstance.start(difficultyVote.getVotedDifficulty());
                     task.cancel();
-                    gameInstance.getGameEvents().getPlayerEventNode().removeChild(taskEvents);
+                    gameEvents.unregister();
                 }
             }
         }
