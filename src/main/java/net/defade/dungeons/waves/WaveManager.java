@@ -145,7 +145,7 @@ public class WaveManager implements Runnable {
                     .append(gameInstance.getDifficulty().getName());
         }
 
-        Title title = Title.title((Component.text("Vague " + currentWave + 1).color(TextColor.color(200, 20, 20))
+        Title title = Title.title((Component.text("Vague " + (currentWave + 1)).color(TextColor.color(200, 20, 20))
                 .decoration(TextDecoration.BOLD, true)), subtitle, times);
 
         gameInstance.showTitle(title);
