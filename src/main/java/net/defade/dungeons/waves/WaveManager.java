@@ -1,7 +1,9 @@
 package net.defade.dungeons.waves;
 
 import net.defade.dungeons.game.GameInstance;
+import net.defade.dungeons.gui.shop.ShopGUI;
 import net.defade.dungeons.utils.GameEvents;
+import net.defade.dungeons.utils.ItemList;
 import net.defade.dungeons.zombies.DungeonsEntity;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
@@ -11,6 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
+import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import java.time.Duration;
@@ -38,7 +41,7 @@ public class WaveManager implements Runnable {
         this.waves = waves;
         this.eventNode = new GameEvents(gameInstance, gameInstance.getGameEvents().getGlobalEventNode());
 
-        updateBossBar();
+        updateWaveStatus();
         announceNewWave();
         registeredTasks.add(gameInstance.scheduler().scheduleTask(this, TaskSchedule.immediate(), TaskSchedule.seconds(1)));
 
@@ -50,6 +53,12 @@ public class WaveManager implements Runnable {
                 timerTicks = 0;
             }
         }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+
+        eventNode.getPlayerEventNode().addListener(PlayerUseItemEvent.class, playerUseItemEvent -> {
+            if(waveStatus == WaveStatus.PAUSE_TIME && playerUseItemEvent.getItemStack().isSimilar(ItemList.RADIO_ON)) {
+                playerUseItemEvent.getPlayer().openInventory(new ShopGUI(this));
+            }
+        });
     }
 
     @Override
@@ -66,7 +75,7 @@ public class WaveManager implements Runnable {
 
                 waveStatus = WaveStatus.PAUSE_TIME;
                 timer = 30;
-                updateBossBar();
+                updateWaveStatus();
 
                 return;
             }
@@ -75,7 +84,7 @@ public class WaveManager implements Runnable {
             if(timer == 0) {
                 timer = 3;
                 if(wave.hasZombiesLeft()) {
-                    updateBossBar();
+                    updateWaveStatus();
                     spawnZombie();
                 }
             }
@@ -85,20 +94,24 @@ public class WaveManager implements Runnable {
             if(timer == 0) {
                 timer = 6;
                 waveStatus = WaveStatus.PLAYING;
-                updateBossBar();
+                updateWaveStatus();
                 announceNewWave();
             }
         }
+    }
+
+    public int getCurrentWave() {
+        return currentWave;
     }
 
     private void spawnZombie() {
         DungeonsEntity entity = waves.get(currentWave).getZombie();
         spawnedZombies.add(entity);
         entity.setInstance(gameInstance, gameInstance.getConfig().getSpawnPoint()); // TODO change the spawn point
-        updateBossBar();
+        updateWaveStatus();
     }
 
-    private void updateBossBar() {
+    private void updateWaveStatus() {
         BossBar bossBar = gameInstance.getBossBar();
 
         if(waveStatus == WaveStatus.PLAYING) {
@@ -109,6 +122,8 @@ public class WaveManager implements Runnable {
                             .append(Component.text("Zombies Restant: ").color(NamedTextColor.WHITE))
                             .append(Component.text(spawnedZombies.size() + waves.get(currentWave).getZombiesLeft()).color(NamedTextColor.RED))
             );
+
+            gameInstance.getPlayers().forEach(player -> player.getInventory().setItemStack(8, ItemList.RADIO_OFF));
         } else if(waveStatus == WaveStatus.PAUSE_TIME) {
             bossBar.color(BossBar.Color.YELLOW);
             bossBar.name(
@@ -117,6 +132,7 @@ public class WaveManager implements Runnable {
                             .append(Component.text(timer + "s").color(NamedTextColor.WHITE))
                             .append(Component.text(")").color(NamedTextColor.GRAY))
             );
+            gameInstance.getPlayers().forEach(player -> player.getInventory().setItemStack(8, ItemList.RADIO_ON));
         }
     }
 

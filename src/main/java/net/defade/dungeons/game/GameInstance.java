@@ -3,6 +3,8 @@ package net.defade.dungeons.game;
 import net.defade.dungeons.difficulty.Difficulty;
 import net.defade.dungeons.game.config.GameConfig;
 import net.defade.dungeons.game.utils.AmethystMapSource;
+import net.defade.dungeons.shop.Armors;
+import net.defade.dungeons.shop.swords.Swords;
 import net.defade.dungeons.utils.GameEvents;
 import net.defade.dungeons.game.utils.GameStartManager;
 import net.defade.dungeons.waves.WaveManager;
@@ -78,6 +80,9 @@ public class GameInstance extends InstanceContainer {
     public void start(Difficulty difficulty) {
         setAcceptsPlayers(false);
         this.difficulty = difficulty;
+        getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_BROADSWORD.getSword()));
+        getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_SWORD.getSword()));
+        getPlayers().forEach(Armors.NOTHING::equipForPlayer);
         new WaveManager(this, config.getWaveConfig(difficulty).getWaves());
     }
 
