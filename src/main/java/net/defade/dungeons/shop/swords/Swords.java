@@ -2,8 +2,16 @@ package net.defade.dungeons.shop.swords;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minestom.server.attribute.Attribute;
+import net.minestom.server.attribute.AttributeModifier;
+import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.entity.Player;
+import net.minestom.server.event.EventNode;
+import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
+import net.minestom.server.event.trait.PlayerEvent;
+import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import java.util.UUID;
 
 import static net.defade.dungeons.shop.swords.SwordType.*;
 
@@ -53,8 +61,46 @@ public enum Swords {
         player.getInventory().setItemStack(0, sword.getAsItemStack());
     }
 
-    private static Sword build(SwordType swordType, Material material, String name, int price, int attackDamage, float attackSpeed, double movementSpeedReduction, int durability) {
+    private static Sword build(SwordType swordType, Material material, String name, int price, int attackDamage, float attackSpeed, float movementSpeedReduction, int durability) {
         return new Sword(swordType, material, Component.text(name).decoration(TextDecoration.ITALIC, false),
                 price, attackDamage, attackSpeed, movementSpeedReduction, durability);
+    }
+
+    public static void registerSwordSelectEvent(EventNode<PlayerEvent> eventNode) {
+        eventNode.addListener(PlayerChangeHeldSlotEvent.class, event -> {
+            Player player = event.getPlayer();
+            ItemStack itemStack = player.getInventory().getItemStack(event.getSlot());
+
+            boolean isSprinting = player.isSprinting();
+            if(itemStack.hasTag(Sword.MOVEMENT_SPEED_REDUCTION_TAG)) {
+                player.getAttribute(Attribute.MOVEMENT_SPEED).addModifier(new AttributeModifier(
+                        UUID.fromString("7AB1E3FF-A61C-46AF-80F1-77A8B649F9E6"),
+                        "generic.movement_speed",
+                        -itemStack.getTag(Sword.MOVEMENT_SPEED_REDUCTION_TAG) / 100,
+                        AttributeOperation.MULTIPLY_BASE
+                ));
+
+                /* In order to keep the fov the same when applying speed, the calculated fov modifier by the client must be 1.0f.
+                   The formula is (MOVEMENT_SPEED / WALKING_SPEED + 1.0F) / 2.0F
+                   MOVEMENT_SPEED / WALKING_SPEED must be 1.0F so that (1.0F + 1.0F) / 2.0F = 1.0F.
+                   MOVEMENT_SPEED / WALKING_SPEED must be 1.0F so MOVEMENT_SPEED = WALKING_SPEED because dividing a number by itself is always 1.
+
+                   Also, mojang are idiots because they named the fov modifier variable walkingSpeed when the only thing it does is change the fov.
+                   In order to change the walking speed, you must change the MOVEMENT_SPEED attribute.
+                */
+                player.setFieldViewModifier(player.getAttribute(Attribute.MOVEMENT_SPEED).getValue());
+            } else {
+                player.setFieldViewModifier(0.1f);
+                player.getAttribute(Attribute.MOVEMENT_SPEED).removeModifier(UUID.fromString("7AB1E3FF-A61C-46AF-80F1-77A8B649F9E6"));
+            }
+
+            if(isSprinting) {
+                /* Mojang are idiots once again. When a player sprints, they add a modifier to the MOVEMENT_SPEED attribute but doesn't send it to the server
+                   and when the client receives the update attributes packet, it just deletes ALL the modifiers including the sprint modifier that ISN'T sent to
+                    the server and adds the attributes that the server sent him, thus deleting the sprint modifier. Nice job, mojang. */
+                player.getAttribute(Attribute.MOVEMENT_SPEED).addModifier(new AttributeModifier(UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D"),
+                        "Sprinting speed boost", 0.3F, AttributeOperation.MULTIPLY_TOTAL));
+            }
+        });
     }
 }

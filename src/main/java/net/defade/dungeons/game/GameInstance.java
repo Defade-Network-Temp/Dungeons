@@ -83,7 +83,9 @@ public class GameInstance extends InstanceContainer {
         getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_BROADSWORD.getSword()));
         getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_SWORD.getSword()));
         getPlayers().forEach(Armors.NOTHING::equipForPlayer);
+
         new WaveManager(this, config.getWaveConfig(difficulty).getWaves());
+        Swords.registerSwordSelectEvent(gameEvents.getPlayerEventNode());
     }
 
     public BossBar getBossBar() {

@@ -14,7 +14,7 @@ import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
 public class Sword {
     public static Tag<Integer> ATTACK_DAMAGE_TAG = Tag.Integer("AttackDamage");
     public static Tag<Float> ATTACK_SPEED_TAG = Tag.Float("AttackSpeed");
-    public static Tag<Double> MOVEMENT_SPEED_REDUCTION_TAG = Tag.Double("MovementSpeedReduction");
+    public static Tag<Float> MOVEMENT_SPEED_REDUCTION_TAG = Tag.Float("MovementSpeedReduction");
     public static Tag<Integer> DURABILITY_TAG = Tag.Integer("Durability");
 
     private final SwordType swordType;
@@ -23,11 +23,11 @@ public class Sword {
     private final int price;
     private final int attackDamage;
     private final float attackSpeed;
-    private final double movementSpeedReduction;
+    private final float movementSpeedReduction;
     private final int durability;
     private Sword nextSword;
 
-    public Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, double movementSpeedReduction, int durability) {
+    public Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedReduction, int durability) {
         this.swordType = swordType;
         this.material = material;
         this.name = name;
@@ -62,7 +62,7 @@ public class Sword {
         return attackSpeed;
     }
 
-    public double getMovementSpeedReduction() {
+    public float getMovementSpeedReduction() {
         return movementSpeedReduction;
     }
 
