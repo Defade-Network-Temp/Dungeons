@@ -56,7 +56,7 @@ public class WaveManager implements Runnable {
 
         eventNode.getPlayerEventNode().addListener(PlayerUseItemEvent.class, playerUseItemEvent -> {
             if(waveStatus == WaveStatus.PAUSE_TIME && playerUseItemEvent.getItemStack().isSimilar(ItemList.RADIO_ON)) {
-                playerUseItemEvent.getPlayer().openInventory(new ShopGUI(this));
+                playerUseItemEvent.getPlayer().openInventory(new ShopGUI(gameInstance.getCoinsManager(), this));
             }
         });
     }

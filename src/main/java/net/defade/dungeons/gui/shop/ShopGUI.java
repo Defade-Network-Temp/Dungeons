@@ -1,5 +1,6 @@
 package net.defade.dungeons.gui.shop;
 
+import net.defade.dungeons.game.CoinsManager;
 import net.defade.dungeons.utils.ItemList;
 import net.defade.dungeons.waves.WaveManager;
 import net.kyori.adventure.text.Component;
@@ -7,7 +8,7 @@ import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 
 public class ShopGUI extends Inventory {
-    public ShopGUI(WaveManager waveManager) {
+    public ShopGUI(CoinsManager coinsManager, WaveManager waveManager) {
         super(InventoryType.CHEST_3_ROW, Component.text("Shop"));
 
         for(int i = 0; i < getSize(); i++) {
@@ -21,7 +22,7 @@ public class ShopGUI extends Inventory {
             inventoryConditionResult.setCancel(true);
 
             if(slot == 12) {
-                player.openInventory(new SwordShopGUI(player));
+                player.openInventory(new SwordShopGUI(coinsManager, player));
             } else if(slot == 14) {
                 player.openInventory(new ArmorShopGUI(waveManager, player));
             }
