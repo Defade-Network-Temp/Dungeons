@@ -84,7 +84,7 @@ public class Sword {
                 .lore(List.of(
                         text("Damage: ").color(GRAY).append(text(getAttackDamage()).color(GREEN)).decoration(ITALIC, false),
                         text("Durability: ").color(GRAY).append(text(getDurability()).color(GREEN)).decoration(ITALIC, false),
-                        text("Atk Speed: ").color(GRAY).append(text(getAttackDamage()).color(GREEN)).decoration(ITALIC, false),
+                        text("Atk Speed: ").color(GRAY).append(text(getAttackSpeed()).color(GREEN)).decoration(ITALIC, false),
                         text("Movement Speed: ").color(GRAY).append(text("-" + getMovementSpeedReduction() + "%").color(RED)).decoration(ITALIC, false),
                         text(""),
                         text("Type: ").color(GRAY).append(getSwordType().getName().color(GREEN)).decoration(ITALIC, false)
