@@ -1,6 +1,7 @@
 package net.defade.dungeons.shop.swords;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemHideFlag;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -79,16 +80,18 @@ public class Sword {
     }
 
     public ItemStack getAsItemStack() { //TODO: Add enchants and power ups here
+        NamedTextColor color = swordType == SwordType.SWORD ? GREEN : YELLOW;
+
         return ItemStack.builder(getMaterial())
                 .displayName(getName())
                 .lore(List.of(
-                        text("Damage: ").color(GRAY).append(text(getAttackDamage()).color(GREEN)).decoration(ITALIC, false),
-                        text("Durability: ").color(GRAY).append(text(getDurability()).color(GREEN)).decoration(ITALIC, false),
-                        text("Atk Speed: ").color(GRAY).append(text(getAttackSpeed()).color(GREEN)).decoration(ITALIC, false),
+                        text("Damage: ").color(GRAY).append(text(getAttackDamage()).color(color)).decoration(ITALIC, false),
+                        text("Durability: ").color(GRAY).append(text(getDurability()).color(color)).decoration(ITALIC, false),
+                        text("Atk Speed: ").color(GRAY).append(text(getAttackSpeed()).color(color)).decoration(ITALIC, false),
                         text("Movement Speed: ").color(GRAY).append(text(
                                         (getMovementSpeedModifier() < 0 ? "" : "+") + getMovementSpeedModifier() + "%").color(getMovementSpeedModifier() < 0 ? RED : GREEN)                        ).decoration(ITALIC, false),
                         text(""),
-                        text("Type: ").color(GRAY).append(getSwordType().getName().color(GREEN)).decoration(ITALIC, false)
+                        text("Type: ").color(GRAY).append(getSwordType().getName().color(color)).decoration(ITALIC, false)
                 ))
                 .set(ATTACK_DAMAGE_TAG, getAttackDamage())
                 .set(ATTACK_SPEED_TAG, getAttackSpeed())
