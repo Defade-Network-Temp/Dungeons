@@ -1,5 +1,6 @@
 package net.defade.dungeons.gui.shop;
 
+import net.defade.dungeons.game.CoinsManager;
 import net.defade.dungeons.shop.swords.Sword;
 import net.defade.dungeons.shop.swords.SwordType;
 import net.defade.dungeons.shop.swords.Swords;
@@ -14,17 +15,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public class SwordShopGUI extends Inventory {
-    private final Map<Integer, Consumer<Player>> slotsActions = new HashMap<>();
+    private final Map<Integer, Runnable> slotsActions = new HashMap<>();
+    private final CoinsManager coinsManager;
+    private final Player player;
 
-    public SwordShopGUI(Player player) {
+    public SwordShopGUI(CoinsManager coinsManager, Player player) {
         super(InventoryType.CHEST_5_ROW, Component.text("Shop > Épées"));
+        this.coinsManager = coinsManager;
+        this.player = player;
 
         for (int slot = 0; slot < getSize(); slot++) {
             setItemStack(slot, ItemList.INVENTORY_FILLER);
@@ -38,15 +42,15 @@ public class SwordShopGUI extends Inventory {
         addInventoryCondition((playerClicking, slot, clickType, inventoryConditionResult) -> {
             inventoryConditionResult.setCancel(true);
 
-            Consumer<Player> action = slotsActions.get(slot);
+            Runnable action = slotsActions.get(slot);
             if(action != null) {
-                action.accept(playerClicking);
-                playerClicking.openInventory(new SwordShopGUI(playerClicking));
+                action.run();
+                playerClicking.openInventory(new SwordShopGUI(coinsManager, playerClicking));
             }
         });
     }
 
-    private ItemStack formatSword(int slot, Sword sword, boolean hasBoughtSword, boolean isEquipped, boolean canEquip, boolean canBuy) {
+    private ItemStack formatSword(int slot, Sword sword, boolean hasBoughtSword, boolean isEquipped, boolean canEquip, boolean canBuy, boolean hasEnoughCoins) {
         ItemStack itemStack = sword.getAsItemStack();
         if(isEquipped) {
             List<Component> lore = new ArrayList<>(itemStack.getLore());
@@ -62,7 +66,7 @@ public class SwordShopGUI extends Inventory {
             lore.add(text(""));
             if(canEquip) {
                 lore.add(text("Équipper").color(GREEN).decoration(ITALIC, false));
-                slotsActions.put(slot, (player) -> Swords.equipSwordForPlayer(player, sword));
+                slotsActions.put(slot, () -> Swords.equipSwordForPlayer(player, sword));
             } else {
                 lore.add(text("Achetée").color(GREEN).decoration(ITALIC, false));
             }
@@ -71,17 +75,16 @@ public class SwordShopGUI extends Inventory {
         } else if(canBuy) {
             List<Component> lore = new ArrayList<>(itemStack.getLore());
             lore.add(text(""));
-            lore.add(text("Cliquez pour acheter").color(YELLOW).decoration(ITALIC, false));
-            /* TODO: Check if the player has enough coins
-            if(!hasEnoughCoins) {
-                lore.add(text("Vous n'avez pas assez d'argent.").color(RED));
+            if(hasEnoughCoins) {
+                lore.add(text("Cliquez pour acheter").color(YELLOW).decoration(ITALIC, false));
+            } else {
+                lore.add(text("Pas assez d'argent.").color(RED));
             }
-             */
 
             itemStack = itemStack.withLore(lore);
 
-            slotsActions.put(slot, (player) -> {
-                //TODO: Withdraw coins
+            slotsActions.put(slot, () -> {
+                coinsManager.removeCoins(player, sword.getPrice());
                 Swords.equipSwordForPlayer(player, sword);
             });
         } else {
@@ -104,7 +107,8 @@ public class SwordShopGUI extends Inventory {
 
         while (sword != null) {
             setItemStack(slot, formatSword(slot, sword, hasBought,
-                    currentPlayerSword == sword && currentPlayerSword.getSwordType() == playerCurrentSwordType, currentPlayerSword == sword, canBuy));
+                    currentPlayerSword == sword && currentPlayerSword.getSwordType() == playerCurrentSwordType,
+                    currentPlayerSword == sword, canBuy, coinsManager.hasEnoughCoins(player, sword.getPrice())));
             if(slot == 12 || slot == 30) slot++; // Add a margin
             slot++;
 

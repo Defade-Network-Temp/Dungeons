@@ -30,6 +30,8 @@ public class GameInstance extends InstanceContainer {
 
     private Difficulty difficulty;
 
+    private final CoinsManager coinsManager = new CoinsManager();
+
     private final BossBar bossBar = BossBar.bossBar(
             Component.text("Démarrage... ").color(NamedTextColor.YELLOW).decorate(TextDecoration.BOLD)
                     .append(Component.text("(").color(NamedTextColor.GRAY))
@@ -102,5 +104,9 @@ public class GameInstance extends InstanceContainer {
 
     public Difficulty getDifficulty() {
         return difficulty;
+    }
+
+    public CoinsManager getCoinsManager() {
+        return coinsManager;
     }
 }
