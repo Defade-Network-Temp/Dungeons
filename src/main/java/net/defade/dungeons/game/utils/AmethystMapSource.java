@@ -49,7 +49,6 @@ public class AmethystMapSource implements AmethystSource {
                 Files.createDirectory(TEMP_DIR);
             } else if (Files.exists(file)) {
                 if (getFileMd5(file.toFile()).equals(mapDocument.getString("md5"))) {
-                    System.out.println("cache");
                     return new FileInputStream(file.toFile());
                 }
             }
@@ -68,7 +67,6 @@ public class AmethystMapSource implements AmethystSource {
             downloadStream.close();
             fileOutputStream.close();
 
-            System.out.println("database");
             return new FileInputStream(file.toFile());
         } catch (IOException exception) {
             exception.printStackTrace(); // TODO Use logger and be more descriptive
