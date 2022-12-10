@@ -1,9 +1,11 @@
 package net.defade.dungeons.zombies;
 
+import net.defade.dungeons.game.GameInstance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.item.ItemStack;
@@ -65,6 +67,19 @@ public abstract class DungeonsEntity extends EntityCreature {
         super.kill();
 
         // TODO drop the items
+    }
+
+    public void setInstance(@NotNull GameInstance instance, @NotNull Pos spawnPosition) {
+        float newHealth = getMaxHealth() + switch (instance.getDifficulty()) {
+            case NORMAL -> 1;
+            case HARD -> 1.25f;
+            case INSANE -> 1.5f;
+        };
+
+        getAttribute(Attribute.MAX_HEALTH).setBaseValue(newHealth);
+        setHealth(newHealth);
+
+        super.setInstance(instance, spawnPosition);
     }
 
     public List<ItemStack> getDrops() {
