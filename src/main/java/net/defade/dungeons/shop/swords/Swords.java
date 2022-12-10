@@ -16,12 +16,12 @@ import java.util.UUID;
 import static net.defade.dungeons.shop.swords.SwordType.*;
 
 public enum Swords {
-    WOODEN_SWORD(build(SWORD, Material.WOODEN_SWORD, "Wooden Sword", 0, 3, 1.5F, 10, 15)),
-    STONE_SWORD(build(SWORD, Material.STONE_SWORD, "Stone Sword", 50, 4, 1.5F, 10, 17)),
-    GOLDEN_SWORD(build(SWORD, Material.GOLDEN_SWORD, "Golden Sword", 200, 5, 1.2F, 15, 18)),
-    IRON_SWORD(build(SWORD, Material.IRON_SWORD, "Iron Sword", 500, 6, 1.3F, 15, 20)),
-    DIAMOND_SWORD(build(SWORD, Material.DIAMOND_SWORD, "Diamond Sword", 750, 8, 1.3F, 15, 21)),
-    NETHERITE_SWORD(build(SWORD, Material.NETHERITE_SWORD, "Netherite Sword", 2000, 9, 1.2F, 20, 23)),
+    WOODEN_SWORD(build(SWORD, Material.WOODEN_SWORD, "Wooden Sword", 0, 3, 1.5F, -10, 15)),
+    STONE_SWORD(build(SWORD, Material.STONE_SWORD, "Stone Sword", 50, 4, 1.5F, -10, 17)),
+    GOLDEN_SWORD(build(SWORD, Material.GOLDEN_SWORD, "Golden Sword", 200, 5, 1.2F, -15, 18)),
+    IRON_SWORD(build(SWORD, Material.IRON_SWORD, "Iron Sword", 500, 6, 1.3F, -15, 20)),
+    DIAMOND_SWORD(build(SWORD, Material.DIAMOND_SWORD, "Diamond Sword", 750, 8, 1.3F, -15, 21)),
+    NETHERITE_SWORD(build(SWORD, Material.NETHERITE_SWORD, "Netherite Sword", 2000, 9, 1.2F, -20, 23)),
 
     WOODEN_BROADSWORD(build(BROADSWORD, Material.WOODEN_HOE, "Wooden Broadsword", 0, 2, 1.8F, 10, 17)),
     STONE_BROADSWORD(build(BROADSWORD, Material.STONE_HOE, "Stone Broadsword", 50, 2, 1.8F, 10, 20)),
@@ -61,9 +61,9 @@ public enum Swords {
         player.getInventory().setItemStack(0, sword.getAsItemStack());
     }
 
-    private static Sword build(SwordType swordType, Material material, String name, int price, int attackDamage, float attackSpeed, float movementSpeedReduction, int durability) {
+    private static Sword build(SwordType swordType, Material material, String name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability) {
         return new Sword(swordType, material, Component.text(name).decoration(TextDecoration.ITALIC, false),
-                price, attackDamage, attackSpeed, movementSpeedReduction, durability);
+                price, attackDamage, attackSpeed, movementSpeedModifier, durability);
     }
 
     public static void registerSwordSelectEvent(EventNode<PlayerEvent> eventNode) {
@@ -72,11 +72,11 @@ public enum Swords {
             ItemStack itemStack = player.getInventory().getItemStack(event.getSlot());
 
             boolean isSprinting = player.isSprinting();
-            if(itemStack.hasTag(Sword.MOVEMENT_SPEED_REDUCTION_TAG)) {
+            if(itemStack.hasTag(Sword.MOVEMENT_SPEED_MODIFIER_TAG)) {
                 player.getAttribute(Attribute.MOVEMENT_SPEED).addModifier(new AttributeModifier(
                         UUID.fromString("7AB1E3FF-A61C-46AF-80F1-77A8B649F9E6"),
                         "generic.movement_speed",
-                        -itemStack.getTag(Sword.MOVEMENT_SPEED_REDUCTION_TAG) / 100,
+                        itemStack.getTag(Sword.MOVEMENT_SPEED_MODIFIER_TAG) / 100,
                         AttributeOperation.MULTIPLY_BASE
                 ));
 

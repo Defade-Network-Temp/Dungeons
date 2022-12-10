@@ -14,7 +14,7 @@ import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
 public class Sword {
     public static Tag<Integer> ATTACK_DAMAGE_TAG = Tag.Integer("AttackDamage");
     public static Tag<Float> ATTACK_SPEED_TAG = Tag.Float("AttackSpeed");
-    public static Tag<Float> MOVEMENT_SPEED_REDUCTION_TAG = Tag.Float("MovementSpeedReduction");
+    public static Tag<Float> MOVEMENT_SPEED_MODIFIER_TAG = Tag.Float("MovementSpeedModifier");
     public static Tag<Integer> DURABILITY_TAG = Tag.Integer("Durability");
 
     private final SwordType swordType;
@@ -23,18 +23,18 @@ public class Sword {
     private final int price;
     private final int attackDamage;
     private final float attackSpeed;
-    private final float movementSpeedReduction;
+    private final float movementSpeedModifier;
     private final int durability;
     private Sword nextSword;
 
-    public Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedReduction, int durability) {
+    public Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability) {
         this.swordType = swordType;
         this.material = material;
         this.name = name;
         this.price = price;
         this.attackDamage = attackDamage;
         this.attackSpeed = attackSpeed;
-        this.movementSpeedReduction = movementSpeedReduction;
+        this.movementSpeedModifier = movementSpeedModifier;
         this.durability = durability;
     }
 
@@ -62,8 +62,8 @@ public class Sword {
         return attackSpeed;
     }
 
-    public float getMovementSpeedReduction() {
-        return movementSpeedReduction;
+    public float getMovementSpeedModifier() {
+        return movementSpeedModifier;
     }
 
     public int getDurability() {
@@ -85,13 +85,14 @@ public class Sword {
                         text("Damage: ").color(GRAY).append(text(getAttackDamage()).color(GREEN)).decoration(ITALIC, false),
                         text("Durability: ").color(GRAY).append(text(getDurability()).color(GREEN)).decoration(ITALIC, false),
                         text("Atk Speed: ").color(GRAY).append(text(getAttackSpeed()).color(GREEN)).decoration(ITALIC, false),
-                        text("Movement Speed: ").color(GRAY).append(text("-" + getMovementSpeedReduction() + "%").color(RED)).decoration(ITALIC, false),
+                        text("Movement Speed: ").color(GRAY).append(text(
+                                        (getMovementSpeedModifier() < 0 ? "" : "+") + getMovementSpeedModifier() + "%").color(getMovementSpeedModifier() < 0 ? RED : GREEN)                        ).decoration(ITALIC, false),
                         text(""),
                         text("Type: ").color(GRAY).append(getSwordType().getName().color(GREEN)).decoration(ITALIC, false)
                 ))
                 .set(ATTACK_DAMAGE_TAG, getAttackDamage())
                 .set(ATTACK_SPEED_TAG, getAttackSpeed())
-                .set(MOVEMENT_SPEED_REDUCTION_TAG, getMovementSpeedReduction())
+                .set(MOVEMENT_SPEED_MODIFIER_TAG, getMovementSpeedModifier())
                 .set(DURABILITY_TAG, getDurability())
                 .meta(builder -> builder.hideFlag(ItemHideFlag.HIDE_ATTRIBUTES))
                 .build();
