@@ -53,7 +53,7 @@ public class AmethystMapSource implements AmethystSource {
                 }
             }
 
-            Files.delete(file); // In case the file has changed and the md5 doesn't match anymore
+            Files.deleteIfExists(file); // In case the file has changed and the md5 doesn't match anymore
             Files.createFile(file);
             FileOutputStream fileOutputStream = new FileOutputStream(file.toFile());
             GridFSDownloadStream downloadStream = bucket.openDownloadStream(fileName, new GridFSDownloadOptions().revision(0));
