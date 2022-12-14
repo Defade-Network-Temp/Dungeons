@@ -1,6 +1,8 @@
 package net.defade.dungeons.zombies;
 
 import net.defade.dungeons.game.GameInstance;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -12,6 +14,7 @@ import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class DungeonsEntity extends EntityCreature {
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.#");
@@ -96,6 +99,16 @@ public abstract class DungeonsEntity extends EntityCreature {
 
     public double getAttackDamage() {
         return attackDamage;
+    }
+
+    public Sound getHurtSound() {
+        return Sound.sound(Key.key("minecraft:entity.zombie.hurt"), Sound.Source.HOSTILE, 1,
+                (ThreadLocalRandom.current().nextFloat() - ThreadLocalRandom.current().nextFloat()) * 0.2F + 1.0F);
+    }
+
+    public Sound getDeathSound() {
+        return Sound.sound(Key.key("minecraft:entity.zombie.death"), Sound.Source.HOSTILE, 1,
+                (ThreadLocalRandom.current().nextFloat() - ThreadLocalRandom.current().nextFloat()) * 0.2F + 1.0F);
     }
 
     @Override

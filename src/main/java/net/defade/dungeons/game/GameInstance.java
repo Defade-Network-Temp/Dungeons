@@ -3,6 +3,7 @@ package net.defade.dungeons.game;
 import net.defade.dungeons.difficulty.Difficulty;
 import net.defade.dungeons.game.config.GameConfig;
 import net.defade.dungeons.game.utils.AmethystMapSource;
+import net.defade.dungeons.pvp.FightHandler;
 import net.defade.dungeons.shop.Armors;
 import net.defade.dungeons.shop.swords.Swords;
 import net.defade.dungeons.utils.GameEvents;
@@ -30,6 +31,7 @@ public class GameInstance extends InstanceContainer {
 
     private Difficulty difficulty;
 
+    private final FightHandler fightHandler = new FightHandler(this);
     private final CoinsManager coinsManager = new CoinsManager();
 
     private final BossBar bossBar = BossBar.bossBar(
@@ -87,7 +89,7 @@ public class GameInstance extends InstanceContainer {
         getPlayers().forEach(Armors.NOTHING::equipForPlayer);
 
         new WaveManager(this, config.getWaveConfig(difficulty).getWaves());
-        Swords.registerSwordSelectEvent(gameEvents.getPlayerEventNode());
+        fightHandler.init();
     }
 
     public BossBar getBossBar() {
