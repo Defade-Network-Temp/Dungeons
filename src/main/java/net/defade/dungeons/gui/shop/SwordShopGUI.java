@@ -84,6 +84,11 @@ public class SwordShopGUI extends Inventory {
             itemStack = itemStack.withLore(lore);
 
             slotsActions.put(slot, () -> {
+                if(!coinsManager.hasEnoughCoins(player, sword.getPrice())) {
+                    player.sendMessage(text("Vous n'avez pas assez d'argent.").color(RED));
+                    return;
+                }
+
                 coinsManager.removeCoins(player, sword.getPrice());
                 Swords.equipSwordForPlayer(player, sword);
             });

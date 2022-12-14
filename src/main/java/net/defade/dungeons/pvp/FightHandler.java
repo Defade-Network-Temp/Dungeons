@@ -76,27 +76,30 @@ public class FightHandler {
     }
 
     private void registerSwordSelectEvent() {
+        gameInstance.getPlayers().forEach(player -> refreshSwordAttributesForPlayer(player, player.getInventory().getItemStack(player.getHeldSlot())));
+
         events.getPlayerEventNode().addListener(PlayerChangeHeldSlotEvent.class, event -> {
-            Player player = event.getPlayer();
-            ItemStack itemStack = player.getInventory().getItemStack(event.getSlot());
-
-            if (itemStack.hasTag(Sword.MOVEMENT_SPEED_MODIFIER_TAG)) {
-                player.getAttribute(Attribute.MOVEMENT_SPEED).addModifier(new AttributeModifier(
-                        SWORD_MOVEMENT_SPEED_MODIFIER_UUID,
-                        "Sword movement speed",
-                        itemStack.getTag(Sword.MOVEMENT_SPEED_MODIFIER_TAG) / 100,
-                        AttributeOperation.MULTIPLY_BASE
-                ));
-            } else {
-                player.getAttribute(Attribute.MOVEMENT_SPEED).removeModifier(SWORD_MOVEMENT_SPEED_MODIFIER_UUID);
-            }
-
-            if (itemStack.hasTag(Sword.ATTACK_SPEED_TAG)) {
-                player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(itemStack.getTag(Sword.ATTACK_SPEED_TAG));
-            } else {
-                player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0f);
-            }
+            refreshSwordAttributesForPlayer(event.getPlayer(), event.getPlayer().getInventory().getItemStack(event.getSlot()));
         });
+    }
+
+    private void refreshSwordAttributesForPlayer(Player player, ItemStack sword) {
+        if (sword.hasTag(Sword.MOVEMENT_SPEED_MODIFIER_TAG)) {
+            player.getAttribute(Attribute.MOVEMENT_SPEED).addModifier(new AttributeModifier(
+                    SWORD_MOVEMENT_SPEED_MODIFIER_UUID,
+                    "Sword movement speed",
+                    sword.getTag(Sword.MOVEMENT_SPEED_MODIFIER_TAG) / 100,
+                    AttributeOperation.MULTIPLY_BASE
+            ));
+        } else {
+            player.getAttribute(Attribute.MOVEMENT_SPEED).removeModifier(SWORD_MOVEMENT_SPEED_MODIFIER_UUID);
+        }
+
+        if (sword.hasTag(Sword.ATTACK_SPEED_TAG)) {
+            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(sword.getTag(Sword.ATTACK_SPEED_TAG));
+        } else {
+            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0f);
+        }
     }
 
     private void registerAttackStrengthTicker() {

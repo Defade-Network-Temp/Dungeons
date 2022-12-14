@@ -13,6 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
+import net.minestom.server.entity.Player;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
@@ -96,6 +97,7 @@ public class WaveManager implements Runnable {
                 waveStatus = WaveStatus.PLAYING;
                 updateWaveStatus();
                 announceNewWave();
+                gameInstance.getPlayers().forEach(Player::closeInventory);
             }
         }
     }
