@@ -42,7 +42,7 @@ public class WaveManager implements Runnable {
         this.waves = waves;
         this.eventNode = new GameEvents(gameInstance, gameInstance.getGameEvents().getGlobalEventNode());
 
-        updateWaveStatus();
+        updateBossbar();
         announceNewWave();
         registeredTasks.add(gameInstance.scheduler().scheduleTask(this, TaskSchedule.immediate(), TaskSchedule.seconds(1)));
 
@@ -76,7 +76,7 @@ public class WaveManager implements Runnable {
 
                 waveStatus = WaveStatus.PAUSE_TIME;
                 timer = 30;
-                updateWaveStatus();
+                updateBossbar();
 
                 return;
             }
@@ -85,20 +85,23 @@ public class WaveManager implements Runnable {
             if(timer == 0) {
                 timer = 3;
                 if(wave.hasZombiesLeft()) {
-                    updateWaveStatus();
+                    updateBossbar();
                     spawnZombie();
                 }
             }
         } else if(waveStatus == WaveStatus.PAUSE_TIME) {
             timer--;
             timerTicks = 0;
+
             if(timer == 0) {
                 timer = 6;
                 waveStatus = WaveStatus.PLAYING;
-                updateWaveStatus();
                 announceNewWave();
+
                 gameInstance.getPlayers().forEach(Player::closeInventory);
             }
+
+            updateBossbar();
         }
     }
 
@@ -110,10 +113,10 @@ public class WaveManager implements Runnable {
         DungeonsEntity entity = waves.get(currentWave).getZombie();
         spawnedZombies.add(entity);
         entity.setInstance(gameInstance, gameInstance.getConfig().getSpawnPoint()); // TODO change the spawn point
-        updateWaveStatus();
+        updateBossbar();
     }
 
-    private void updateWaveStatus() {
+    private void updateBossbar() {
         BossBar bossBar = gameInstance.getBossBar();
 
         if(waveStatus == WaveStatus.PLAYING) {
