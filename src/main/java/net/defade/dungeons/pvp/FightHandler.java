@@ -246,6 +246,9 @@ public class FightHandler {
                                     particlesAmount,
                                     null
                             ));
+                        } else if(targetHealth <= 0) {
+                            gameInstance.getCoinsManager().addCoins(attacker, target.getDungeonsCoins());
+                            // TODO send message to player
                         }
 
                         // TODO attacker.causeFoodExhaustion(0.1F);
