@@ -108,6 +108,10 @@ public class FightHandler {
         } else {
             player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0f);
         }
+
+        if(sword.hasTag(Sword.ATTACK_DAMAGE_TAG)) {
+            player.setTag(Sword.ATTACK_DAMAGE_TAG, sword.getTag(Sword.ATTACK_DAMAGE_TAG));
+        }
     }
 
     private void registerAttackStrengthTicker() {
@@ -140,10 +144,9 @@ public class FightHandler {
 
             if (event.getEntity() instanceof Player attacker) {
                 if (attacker.getItemInMainHand().hasTag(Sword.ATTACK_DAMAGE_TAG)) {
-                    float attackDamage = attacker.getAttributeValue(Attribute.ATTACK_DAMAGE);
+                    float attackDamage = attacker.getTag(Sword.ATTACK_DAMAGE_TAG) * (1 - target.getDamageResistance() * 0.01F);
 
                     float attackStrength = this.getAttackStrengthScale(attacker);
-                    attackDamage *= 0.2F + attackStrength * attackStrength * 0.8F;
                     resetAttackStrengthTicker(attacker);
                     if (attackDamage > 0.0F) {
                         boolean hasEnoughStrength = attackStrength > 0.9F;
@@ -154,13 +157,7 @@ public class FightHandler {
                         }
 
                         boolean critical = hasEnoughStrength && attacker.getGravityTickCount() > 0.0F && !attacker.isOnGround() && !isPlayerOnClimbable(attacker) && !isPlayerInWater(attacker) && !attacker.isSprinting();
-                        if (critical) {
-                            attackDamage *= 1.5F;
-                        }
-
                         boolean sweeping = hasEnoughStrength && !critical && attacker.isOnGround() && !attacker.isSprinting();
-
-                        target.damage(DamageType.fromPlayer(attacker), attackDamage);
 
                         double xDiff = attacker.getPosition().x() - target.getPosition().x();
 
@@ -182,6 +179,8 @@ public class FightHandler {
                         }
 
                         if (sweeping) {
+                            target.damage(DamageType.fromPlayer(attacker), attackDamage * 0.5F);
+
                             double xRot = Math.sin(attacker.getPosition().yaw() * ((float) Math.PI / 180F));
                             double zRot = Math.cos(attacker.getPosition().yaw() * ((float) Math.PI / 180F));
 
@@ -213,11 +212,12 @@ public class FightHandler {
                                     0,
                                     null
                             ));
-                        }
-
-                        if (critical) {
+                        } else if (critical) {
+                            target.damage(DamageType.fromPlayer(attacker), attackDamage * 1.5F);
                             gameInstance.playSound(Sound.sound(Key.key("entity.player.attack.crit"), Sound.Source.PLAYER, 1.0F, 1.0F), attacker.getPosition());
                             attacker.sendPacketToViewers(new EntityAnimationPacket(target.getEntityId(), EntityAnimationPacket.Animation.CRITICAL_EFFECT));
+                        } else {
+                            target.damage(DamageType.fromPlayer(attacker), attackDamage);
                         }
 
                         if (!critical && !sweeping) {
@@ -227,8 +227,6 @@ public class FightHandler {
                                 gameInstance.playSound(Sound.sound(Key.key("entity.player.attack.weak"), Sound.Source.PLAYER, 1.0F, 1.0F), attacker.getPosition());
                             }
                         }
-
-                        target.damage(DamageType.fromPlayer(attacker), attackDamage);
 
                         float targetHealth = target.getHealth();
                         if (targetHealth > 2.0F) {

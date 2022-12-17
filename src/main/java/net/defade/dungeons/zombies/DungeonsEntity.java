@@ -1,6 +1,7 @@
 package net.defade.dungeons.zombies;
 
 import net.defade.dungeons.game.GameInstance;
+import net.defade.dungeons.shop.Armors;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -8,8 +9,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.Player;
+import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
@@ -24,11 +28,11 @@ public abstract class DungeonsEntity extends EntityCreature {
     private final int ticksPerRegen;
     private final int dungeonsCoins;
     private final double speed;
-    private final double damageResistance;
-    private final double attackDamage;
+    private final float damageResistance;
+    private final float attackDamage;
 
     public DungeonsEntity(@NotNull EntityType entityType, String name, float health, int regen, int ticksPerRegen,
-                          int dungeonsCoins, double speed, double damageResistance, double attackDamage) {
+                          int dungeonsCoins, double speed, float damageResistance, float attackDamage) {
         super(entityType);
 
         this.name = name;
@@ -72,6 +76,18 @@ public abstract class DungeonsEntity extends EntityCreature {
         // TODO drop the items
     }
 
+    @Override
+    public void attack(@NotNull Entity target, boolean swingHand) {
+        super.attack(target, swingHand);
+
+        GameInstance gameInstance = (GameInstance) getInstance();
+        if(target instanceof Player player && gameInstance != null) {
+            int playerDamageResistance = player.getTag(Armors.DAMAGE_RESISTANCE_PERCENTAGE_TAG);
+            player.damage(DamageType.fromEntity(this),
+                (attackDamage * gameInstance.getConfig().getDamageMultiplier(gameInstance.getDifficulty())) * (1 - (playerDamageResistance * 0.01F)));
+        }
+    }
+
     public void setInstance(@NotNull GameInstance instance, @NotNull Pos spawnPosition) {
         float newHealth = getMaxHealth() + switch (instance.getDifficulty()) {
             case NORMAL -> 1;
@@ -93,7 +109,7 @@ public abstract class DungeonsEntity extends EntityCreature {
         return dungeonsCoins;
     }
 
-    public double getDamageResistance() {
+    public float getDamageResistance() {
         return damageResistance;
     }
 
