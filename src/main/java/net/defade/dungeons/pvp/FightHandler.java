@@ -175,6 +175,8 @@ public class FightHandler {
                             );
 
                             attacker.setVelocity(attacker.getVelocity().mul(0.6D, 1.0D, 0.6D));
+
+                            attacker.getAttribute(Attribute.MOVEMENT_SPEED).removeModifier(MOJANG_SPRINTING_MODIFIER);
                             attacker.setSprinting(false);
                         }
 
