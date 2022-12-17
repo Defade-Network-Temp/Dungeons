@@ -189,7 +189,7 @@ public class FightHandler {
                             int sweepHits = 0;
                             for (Entity entity : gameInstance.getNearbyEntities(target.getPosition(), target.getBoundingBox().maxX() + 1)) {
                                 if (!(entity instanceof LivingEntity livingEntity)) return;
-                                if (livingEntity != attacker && livingEntity != target && attacker.getPosition().distanceSquared(livingEntity.getPosition()) < 9.0D) {
+                                if (livingEntity instanceof DungeonsEntity && livingEntity != target && attacker.getPosition().distanceSquared(livingEntity.getPosition()) < 9.0D) {
                                     sweepHits++;
                                     livingEntity.takeKnockback(0.5f, xRot, -zRot);
                                     livingEntity.damage(DamageType.fromPlayer(attacker), attackDamage);
