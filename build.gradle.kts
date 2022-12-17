@@ -16,6 +16,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.defade:Yokura:1.19.2-R1.1-SNAPSHOT")
+    compileOnly("net.defade:Yokura:1.19.2-R1.2-SNAPSHOT")
     api("org.json:json:20220924")
 }

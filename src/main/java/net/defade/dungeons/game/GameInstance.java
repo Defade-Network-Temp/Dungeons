@@ -31,6 +31,7 @@ public class GameInstance extends InstanceContainer {
 
     private Difficulty difficulty;
 
+    private WaveManager waveManager;
     private final FightHandler fightHandler = new FightHandler(this);
     private final CoinsManager coinsManager = new CoinsManager();
 
@@ -77,6 +78,11 @@ public class GameInstance extends InstanceContainer {
         this.acceptsPlayers = acceptsPlayers;
     }
 
+    public void finishGame() {
+        waveManager.stop();
+        fightHandler.stop();
+    }
+
     public void unregisterGame() {
         gameManager.unregisterGame(this);
     }
@@ -84,11 +90,12 @@ public class GameInstance extends InstanceContainer {
     public void start(Difficulty difficulty) {
         setAcceptsPlayers(false);
         this.difficulty = difficulty;
+
         getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_BROADSWORD.getSword()));
         getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_SWORD.getSword()));
         getPlayers().forEach(Armors.NOTHING::equipForPlayer);
 
-        new WaveManager(this, config.getWaveConfig(difficulty).getWaves());
+        waveManager = new WaveManager(this, config.getWaveConfig(difficulty).getWaves());
         fightHandler.init();
     }
 

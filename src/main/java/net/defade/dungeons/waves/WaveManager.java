@@ -109,6 +109,13 @@ public class WaveManager implements Runnable {
         return currentWave;
     }
 
+    public void stop() {
+        eventNode.unregister();
+        for (Task task : registeredTasks) {
+            task.cancel();
+        }
+    }
+
     private void spawnZombie() {
         DungeonsEntity entity = waves.get(currentWave).getZombie();
         spawnedZombies.add(entity);
@@ -155,12 +162,5 @@ public class WaveManager implements Runnable {
 
         gameInstance.showTitle(title);
         gameInstance.playSound(Sound.sound(Key.key("minecraft:entity.wither.spawn"), Sound.Source.HOSTILE, 1.0F, 0F));
-    }
-
-    private void stop() {
-        eventNode.unregister();
-        for (Task task : registeredTasks) {
-            task.cancel();
-        }
     }
 }

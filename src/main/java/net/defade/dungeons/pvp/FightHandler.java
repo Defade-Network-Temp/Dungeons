@@ -6,6 +6,8 @@ import net.defade.dungeons.utils.GameEvents;
 import net.defade.dungeons.zombies.DungeonsEntity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeModifier;
@@ -20,6 +22,7 @@ import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.entity.EntityDeathEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
+import net.minestom.server.event.player.PlayerDeathEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.event.player.PlayerStartSprintingEvent;
@@ -32,7 +35,9 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.particle.ParticleCreator;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -45,7 +50,9 @@ public class FightHandler {
     private final GameEvents events;
 
     private final Map<Player, Integer> playersAttackStrengthTicker = new HashMap<>();
-    private Task attackStrengthTickerTask;
+    private final Map<Player, Long> deadPlayers = new HashMap<>();
+
+    private final List<Task> tasks = new ArrayList<>();
 
     public FightHandler(GameInstance gameInstance) {
         this.gameInstance = gameInstance;
@@ -58,11 +65,12 @@ public class FightHandler {
         registerAttackStrengthTicker();
         registerAttackEvent();
         registerEntitySoundsEvent();
+        registerDeathEvent();
     }
 
     public void stop() {
         events.unregister();
-        attackStrengthTickerTask.cancel();
+        tasks.forEach(Task::cancel);
     }
 
     private void registerSprintAttributeFixEvent() {
@@ -113,9 +121,9 @@ public class FightHandler {
             playersAttackStrengthTicker.remove(event.getPlayer());
         });
 
-        attackStrengthTickerTask = gameInstance.scheduler().scheduleTask(() -> {
+        tasks.add(gameInstance.scheduler().scheduleTask(() -> {
             playersAttackStrengthTicker.replaceAll((player, attackStrength) -> attackStrength + 1);
-        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+        }, TaskSchedule.immediate(), TaskSchedule.tick(1)));
     }
 
     private float getAttackStrengthScale(Player player) {
@@ -261,6 +269,74 @@ public class FightHandler {
         events.getEntityEventNode().addListener(EntityDeathEvent.class, event -> {
             if(event.getEntity() instanceof DungeonsEntity dungeonsEntity) {
                 gameInstance.playSound(dungeonsEntity.getDeathSound(), dungeonsEntity);
+            }
+        });
+    }
+
+    private void registerDeathEvent() {
+        gameInstance.getPlayers().forEach(player -> player.setEnableRespawnScreen(false));
+
+        tasks.add(gameInstance.scheduler().scheduleTask(() -> {
+            long currentTime = System.currentTimeMillis();
+
+            for (Map.Entry<Player, Long> deadPlayerEntry : deadPlayers.entrySet()) {
+                Player player = deadPlayerEntry.getKey();
+                long deathTime = deadPlayerEntry.getValue();
+
+                Pos nearestPlayerPos = player.getPosition();
+                double nearestDistance = Double.MAX_VALUE;
+
+                for (Player playingPlayers : gameInstance.getPlayers()) {
+                    if (playingPlayers == player || deadPlayers.containsKey(playingPlayers)) continue;
+
+                    double distance = player.getPosition().distanceSquared(playingPlayers.getPosition());
+                    if (distance < nearestDistance) {
+                        if (distance < 25 * 25) {
+                            nearestPlayerPos = null;
+                            break;
+                        }
+                        nearestDistance = distance;
+                        nearestPlayerPos = playingPlayers.getPosition();
+                    }
+                }
+
+                if (nearestPlayerPos != null) {
+                    player.teleport(nearestPlayerPos);
+                    player.sendMessage(Component.text("Ne vous éloignez pas trop de vos équipiers!", NamedTextColor.RED));
+                }
+
+                int timeLeft = switch (gameInstance.getDifficulty()) {
+                    case NORMAL -> 40 * 1000;
+                    case HARD -> 50 * 1000;
+                    case INSANE -> Integer.MAX_VALUE; // No respawn for you!
+                };
+
+                if(currentTime - deathTime > timeLeft) {
+                    player.teleport(gameInstance.getConfig().getSpawnPoint());
+                    player.setHealth(player.getMaxHealth());
+
+                    deadPlayers.remove(player);
+                }
+            }
+        }, TaskSchedule.immediate(), TaskSchedule.tick(10)));
+
+        events.getPlayerEventNode().addListener(PlayerDeathEvent.class, event -> {
+            Player player = event.getPlayer();
+            deadPlayers.put(player, System.currentTimeMillis());
+
+            int lostCoins = (int) (gameInstance.getCoinsManager().getCoins(player) * switch (gameInstance.getDifficulty()) {
+                case NORMAL -> 0.10;
+                case HARD -> 0.25;
+                case INSANE -> 0.50;
+            });
+            event.setChatMessage(player.getName().append(Component.text(" est mort !").color(NamedTextColor.RED))); // TODO do text formatting
+            player.sendMessage(Component.text("(-" + lostCoins + " coins)."));
+            gameInstance.getCoinsManager().removeCoins(player, lostCoins);
+
+            player.setGameMode(GameMode.SPECTATOR);
+
+            if(deadPlayers.keySet().containsAll(gameInstance.getPlayers())) {
+                gameInstance.finishGame();
             }
         });
     }
