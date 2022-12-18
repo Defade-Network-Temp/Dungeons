@@ -8,19 +8,19 @@ import net.minestom.server.item.Material;
 import static net.defade.dungeons.shop.swords.SwordType.*;
 
 public enum Swords {
-    WOODEN_SWORD(build(SWORD, Material.WOODEN_SWORD, "Wooden Sword", 0, 3, 1.4F, -10, 15)),
-    STONE_SWORD(build(SWORD, Material.STONE_SWORD, "Stone Sword", 50, 4, 1.4F, -10, 17)),
-    GOLDEN_SWORD(build(SWORD, Material.GOLDEN_SWORD, "Golden Sword", 200, 5, 1.3F, -15, 18)),
-    IRON_SWORD(build(SWORD, Material.IRON_SWORD, "Iron Sword", 500, 6, 1.2F, -15, 20)),
-    DIAMOND_SWORD(build(SWORD, Material.DIAMOND_SWORD, "Diamond Sword", 750, 8, 1.2F, -15, 21)),
-    NETHERITE_SWORD(build(SWORD, Material.NETHERITE_SWORD, "Netherite Sword", 2000, 9, 1.1F, -20, 23)),
+    WOODEN_SWORD(build(SWORD, Material.WOODEN_SWORD, "Wooden Sword", 0, 3, 1.4F, -10, 15, true)),
+    STONE_SWORD(build(SWORD, Material.STONE_SWORD, "Stone Sword", 50, 4, 1.4F, -10, 17, true)),
+    GOLDEN_SWORD(build(SWORD, Material.GOLDEN_SWORD, "Golden Sword", 200, 5, 1.3F, -15, 18, true)),
+    IRON_SWORD(build(SWORD, Material.IRON_SWORD, "Iron Sword", 500, 6, 1.2F, -15, 20, true)),
+    DIAMOND_SWORD(build(SWORD, Material.DIAMOND_SWORD, "Diamond Sword", 750, 8, 1.2F, -15, 21, true)),
+    NETHERITE_SWORD(build(SWORD, Material.NETHERITE_SWORD, "Netherite Sword", 2000, 9, 1.1F, -20, 23, true)),
 
-    WOODEN_BROADSWORD(build(BROADSWORD, Material.WOODEN_HOE, "Wooden Broadsword", 0, 2, 2.0F, 10, 17)),
-    STONE_BROADSWORD(build(BROADSWORD, Material.STONE_HOE, "Stone Broadsword", 50, 2, 2.0F, 10, 20)),
-    GOLDEN_BROADSWORD(build(BROADSWORD, Material.GOLDEN_HOE, "Golden Broadsword", 200, 3, 1.9F, 15, 22)),
-    IRON_BROADSWORD(build(BROADSWORD, Material.IRON_HOE, "Iron Broadsword", 500, 5, 1.9F, 15, 24)),
-    DIAMOND_BROADSWORD(build(BROADSWORD, Material.DIAMOND_HOE, "Diamond Broadsword", 750, 6, 1.9F, 15, 26)),
-    NETHERITE_BROADSWORD(build(BROADSWORD, Material.NETHERITE_HOE, "Netherite Broadsword", 2000, 7, 1.7F, 20, 28));
+    WOODEN_BROADSWORD(build(BROADSWORD, Material.WOODEN_HOE, "Wooden Broadsword", 0, 2, 2.0F, 10, 17, false)),
+    STONE_BROADSWORD(build(BROADSWORD, Material.STONE_HOE, "Stone Broadsword", 50, 2, 2.0F, 10, 20, false)),
+    GOLDEN_BROADSWORD(build(BROADSWORD, Material.GOLDEN_HOE, "Golden Broadsword", 200, 3, 1.9F, 15, 22, false)),
+    IRON_BROADSWORD(build(BROADSWORD, Material.IRON_HOE, "Iron Broadsword", 500, 5, 1.9F, 15, 24, false)),
+    DIAMOND_BROADSWORD(build(BROADSWORD, Material.DIAMOND_HOE, "Diamond Broadsword", 750, 6, 1.9F, 15, 26, true)),
+    NETHERITE_BROADSWORD(build(BROADSWORD, Material.NETHERITE_HOE, "Netherite Broadsword", 2000, 7, 1.7F, 20, 28, true));
 
     static {
         WOODEN_SWORD.getSword().setNextSword(STONE_SWORD.getSword());
@@ -53,8 +53,8 @@ public enum Swords {
         player.getInventory().setItemStack(0, sword.getAsItemStack());
     }
 
-    private static Sword build(SwordType swordType, Material material, String name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability) {
+    private static Sword build(SwordType swordType, Material material, String name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability, boolean canSweep) {
         return new Sword(swordType, material, Component.text(name).decoration(TextDecoration.ITALIC, false),
-                price, attackDamage, attackSpeed, movementSpeedModifier, durability);
+                price, attackDamage, attackSpeed, movementSpeedModifier, durability, canSweep);
     }
 }

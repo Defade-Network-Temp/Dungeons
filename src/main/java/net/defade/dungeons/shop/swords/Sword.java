@@ -17,6 +17,7 @@ public class Sword {
     public static Tag<Float> ATTACK_SPEED_TAG = Tag.Float("AttackSpeed");
     public static Tag<Float> MOVEMENT_SPEED_MODIFIER_TAG = Tag.Float("MovementSpeedModifier");
     public static Tag<Integer> DURABILITY_TAG = Tag.Integer("Durability");
+    public static Tag<Boolean> CAN_SWEEP_TAG = Tag.Boolean("CanSweep").defaultValue(false);
 
     private final SwordType swordType;
     private final Material material;
@@ -26,9 +27,10 @@ public class Sword {
     private final float attackSpeed;
     private final float movementSpeedModifier;
     private final int durability;
+    private final boolean canSweep;
     private Sword nextSword;
 
-    public Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability) {
+    public Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability, boolean canSweep) {
         this.swordType = swordType;
         this.material = material;
         this.name = name;
@@ -37,6 +39,7 @@ public class Sword {
         this.attackSpeed = attackSpeed;
         this.movementSpeedModifier = movementSpeedModifier;
         this.durability = durability;
+        this.canSweep = canSweep;
     }
 
     public SwordType getSwordType() {
@@ -71,6 +74,10 @@ public class Sword {
         return durability;
     }
 
+    public boolean canSweep() {
+        return canSweep;
+    }
+
     public Sword getNextSword() {
         return nextSword;
     }
@@ -88,8 +95,9 @@ public class Sword {
                         text("Damage: ").color(GRAY).append(text(getAttackDamage()).color(color)).decoration(ITALIC, false),
                         text("Durability: ").color(GRAY).append(text(getDurability()).color(color)).decoration(ITALIC, false),
                         text("Atk Speed: ").color(GRAY).append(text(getAttackSpeed()).color(color)).decoration(ITALIC, false),
-                        text("Movement Speed: ").color(GRAY).append(text(
-                                        (getMovementSpeedModifier() < 0 ? "" : "+") + getMovementSpeedModifier() + "%").color(getMovementSpeedModifier() < 0 ? RED : GREEN)                        ).decoration(ITALIC, false),
+                        text("Movement Speed: ").color(GRAY).append(text((getMovementSpeedModifier() < 0 ? "" : "+") + getMovementSpeedModifier() + "%")
+                                .color(getMovementSpeedModifier() < 0 ? RED : GREEN)).decoration(ITALIC, false),
+                        text("Sweep Activé: ").color(GRAY).append(text(canSweep() ? "Oui" : "Non").color(canSweep() ? GREEN : RED)).decoration(ITALIC, false),
                         text(""),
                         text("Type: ").color(GRAY).append(getSwordType().getName().color(color)).decoration(ITALIC, false)
                 ))
@@ -97,6 +105,7 @@ public class Sword {
                 .set(ATTACK_SPEED_TAG, getAttackSpeed())
                 .set(MOVEMENT_SPEED_MODIFIER_TAG, getMovementSpeedModifier())
                 .set(DURABILITY_TAG, getDurability())
+                .set(CAN_SWEEP_TAG, canSweep())
                 .meta(builder -> builder.hideFlag(ItemHideFlag.HIDE_ATTRIBUTES))
                 .build();
     }

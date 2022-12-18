@@ -108,10 +108,6 @@ public class FightHandler {
         } else {
             player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0f);
         }
-
-        if(sword.hasTag(Sword.ATTACK_DAMAGE_TAG)) {
-            player.setTag(Sword.ATTACK_DAMAGE_TAG, sword.getTag(Sword.ATTACK_DAMAGE_TAG));
-        }
     }
 
     private void registerAttackStrengthTicker() {
@@ -143,8 +139,9 @@ public class FightHandler {
             if (!(event.getTarget() instanceof DungeonsEntity target)) return;
 
             if (event.getEntity() instanceof Player attacker) {
-                if (attacker.getItemInMainHand().hasTag(Sword.ATTACK_DAMAGE_TAG)) {
-                    float attackDamage = attacker.getTag(Sword.ATTACK_DAMAGE_TAG) * (1 - target.getDamageResistance() * 0.01F);
+                ItemStack sword = attacker.getItemInMainHand();
+                if (sword.hasTag(Sword.ATTACK_DAMAGE_TAG)) {
+                    float attackDamage = sword.getTag(Sword.ATTACK_DAMAGE_TAG) * (1 - target.getDamageResistance() * 0.01F);
 
                     float attackStrength = this.getAttackStrengthScale(attacker);
                     resetAttackStrengthTicker(attacker);
@@ -157,7 +154,7 @@ public class FightHandler {
                         }
 
                         boolean critical = hasEnoughStrength && attacker.getGravityTickCount() > 0.0F && !attacker.isOnGround() && !isPlayerOnClimbable(attacker) && !isPlayerInWater(attacker) && !attacker.isSprinting();
-                        boolean sweeping = hasEnoughStrength && !critical && attacker.isOnGround() && !attacker.isSprinting();
+                        boolean sweeping = sword.getTag(Sword.CAN_SWEEP_TAG) && hasEnoughStrength && !critical && attacker.isOnGround() && !attacker.isSprinting();
 
                         double xDiff = attacker.getPosition().x() - target.getPosition().x();
 
