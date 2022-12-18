@@ -54,8 +54,8 @@ public class Sword {
         return name;
     }
 
-    public int getPrice() {
-        return price;
+    public int getPrice(float multiplier) {
+        return (int) Math.ceil(price * multiplier);
     }
 
     public int getAttackDamage() {

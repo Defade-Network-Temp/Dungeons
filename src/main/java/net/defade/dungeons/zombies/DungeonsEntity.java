@@ -80,20 +80,20 @@ public abstract class DungeonsEntity extends EntityCreature {
     public void attack(@NotNull Entity target, boolean swingHand) {
         super.attack(target, swingHand);
 
-        GameInstance gameInstance = (GameInstance) getInstance();
-        if(target instanceof Player player && gameInstance != null) {
+        if(target instanceof Player player && getInstance() != null) {
             int playerDamageResistance = player.getTag(Armors.DAMAGE_RESISTANCE_PERCENTAGE_TAG);
             player.damage(DamageType.fromEntity(this),
-                (attackDamage * gameInstance.getConfig().getDamageMultiplier(gameInstance.getDifficulty())) * (1 - (playerDamageResistance * 0.01F)));
+                (attackDamage * getInstance().getConfig().getDamageMultiplier(getInstance().getDifficulty())) * (1 - (playerDamageResistance * 0.01F)));
         }
     }
 
+    @Override
+    public GameInstance getInstance() {
+        return ((GameInstance) super.getInstance());
+    }
+
     public void setInstance(@NotNull GameInstance instance, @NotNull Pos spawnPosition) {
-        float newHealth = getMaxHealth() + switch (instance.getDifficulty()) {
-            case NORMAL -> 1;
-            case HARD -> 1.25f;
-            case INSANE -> 1.5f;
-        };
+        float newHealth = getMaxHealth() + instance.getConfig().getHealthMultiplier(instance.getDifficulty());
 
         getAttribute(Attribute.MAX_HEALTH).setBaseValue(newHealth);
         setHealth(newHealth);
