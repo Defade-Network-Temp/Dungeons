@@ -93,7 +93,7 @@ public abstract class DungeonsEntity extends EntityCreature {
     }
 
     public void setInstance(@NotNull GameInstance instance, @NotNull Pos spawnPosition) {
-        float newHealth = getMaxHealth() + instance.getConfig().getHealthMultiplier(instance.getDifficulty());
+        float newHealth = getMaxHealth() * instance.getConfig().getHealthMultiplier(instance.getDifficulty());
 
         getAttribute(Attribute.MAX_HEALTH).setBaseValue(newHealth);
         setHealth(newHealth);
