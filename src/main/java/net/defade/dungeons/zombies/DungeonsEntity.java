@@ -84,6 +84,15 @@ public abstract class DungeonsEntity extends EntityCreature {
             int playerDamageResistance = player.getTag(Armors.DAMAGE_RESISTANCE_PERCENTAGE_TAG);
             player.damage(DamageType.fromEntity(this),
                 (attackDamage * getInstance().getConfig().getDamageMultiplier(getInstance().getDifficulty())) * (1 - (playerDamageResistance * 0.01F)));
+
+            double xDiff = getPosition().x() - target.getPosition().x();
+
+            double zKnockback;
+            for(zKnockback = getPosition().z() - target.getPosition().z(); xDiff * xDiff + zKnockback * zKnockback < 0.0001; zKnockback = (Math.random() - Math.random()) * 0.01D) {
+                xDiff = (Math.random() - Math.random()) * 0.01D;
+            }
+
+            target.takeKnockback(0.2F, xDiff, zKnockback);
         }
     }
 

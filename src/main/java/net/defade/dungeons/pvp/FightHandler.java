@@ -341,6 +341,10 @@ public class FightHandler {
         });
     }
 
+    public boolean isDead(Player player) {
+        return deadPlayers.containsKey(player);
+    }
+
     private static boolean isPlayerOnClimbable(Player player) {
         if (player.getGameMode() == GameMode.SPECTATOR) {
             return false;

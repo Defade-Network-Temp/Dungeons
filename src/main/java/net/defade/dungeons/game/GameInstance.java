@@ -118,4 +118,8 @@ public class GameInstance extends InstanceContainer {
     public CoinsManager getCoinsManager() {
         return coinsManager;
     }
+
+    public FightHandler getFightHandler() {
+        return fightHandler;
+    }
 }
