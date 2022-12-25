@@ -1,5 +1,7 @@
 package net.defade.dungeons.shop.swords;
 
+import net.defade.dungeons.difficulty.GameDifficulty;
+import net.defade.dungeons.game.GameInstance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.entity.Player;
@@ -23,38 +25,47 @@ public enum Swords {
     NETHERITE_BROADSWORD(build(BROADSWORD, Material.NETHERITE_HOE, "Netherite Broadsword", 2000, 7, 1.7F, 20, 28, true));
 
     static {
-        WOODEN_SWORD.getSword().setNextSword(STONE_SWORD.getSword());
-        STONE_SWORD.getSword().setNextSword(GOLDEN_SWORD.getSword());
-        GOLDEN_SWORD.getSword().setNextSword(IRON_SWORD.getSword());
-        IRON_SWORD.getSword().setNextSword(DIAMOND_SWORD.getSword());
-        DIAMOND_SWORD.getSword().setNextSword(NETHERITE_SWORD.getSword());
+        WOODEN_SWORD.nextSword = STONE_SWORD;
+        STONE_SWORD.nextSword = GOLDEN_SWORD;
+        GOLDEN_SWORD.nextSword = IRON_SWORD;
+        IRON_SWORD.nextSword = DIAMOND_SWORD;
+        DIAMOND_SWORD.nextSword = NETHERITE_SWORD;
 
-        WOODEN_BROADSWORD.getSword().setNextSword(STONE_BROADSWORD.getSword());
-        STONE_BROADSWORD.getSword().setNextSword(GOLDEN_BROADSWORD.getSword());
-        GOLDEN_BROADSWORD.getSword().setNextSword(IRON_BROADSWORD.getSword());
-        IRON_BROADSWORD.getSword().setNextSword(DIAMOND_BROADSWORD.getSword());
-        DIAMOND_BROADSWORD.getSword().setNextSword(NETHERITE_BROADSWORD.getSword());
+        WOODEN_BROADSWORD.nextSword = STONE_BROADSWORD;
+        STONE_BROADSWORD.nextSword = GOLDEN_BROADSWORD;
+        GOLDEN_BROADSWORD.nextSword = IRON_BROADSWORD;
+        IRON_BROADSWORD.nextSword = DIAMOND_BROADSWORD;
+        DIAMOND_BROADSWORD.nextSword = NETHERITE_BROADSWORD;
     }
 
-    private final Sword sword;
+    private final SwordConfig sword;
+    private Swords nextSword = null;
 
-    Swords(Sword sword) {
+    Swords(SwordConfig sword) {
         this.sword = sword;
     }
 
-    public Sword getSword() {
-        return sword;
+    public Sword getSword(GameDifficulty gameDifficulty) {
+        return sword.getAsSword(gameDifficulty);
     }
 
-    public static void equipSwordForPlayer(Player player, Sword sword) {
-        player.setTag(SwordType.SWORD_TYPE_TAG, sword.getSwordType());
-        player.setTag(sword.getSwordType().getSwordTag(), sword);
-
-        player.getInventory().setItemStack(0, sword.getAsItemStack());
+    public Swords getNextSword() {
+        return nextSword;
     }
 
-    private static Sword build(SwordType swordType, Material material, String name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability, boolean canSweep) {
-        return new Sword(swordType, material, Component.text(name).decoration(TextDecoration.ITALIC, false),
+    public static void equipSwordForPlayer(Player player, Swords sword) {
+        GameInstance gameInstance = (GameInstance) player.getInstance();
+
+        if(gameInstance != null) {
+            Sword swordToEquip = sword.getSword(gameInstance.getDifficulty());
+
+            player.setTag(swordToEquip.getSwordType().getSwordTag(), sword);
+            player.getInventory().setItemStack(0, swordToEquip.getAsItemStack());
+        }
+    }
+
+    private static SwordConfig build(SwordType swordType, Material material, String name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability, boolean canSweep) {
+        return new SwordConfig(swordType, material, Component.text(name).decoration(TextDecoration.ITALIC, false),
                 price, attackDamage, attackSpeed, movementSpeedModifier, durability, canSweep);
     }
 }

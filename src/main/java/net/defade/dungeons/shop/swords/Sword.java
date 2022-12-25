@@ -1,99 +1,74 @@
 package net.defade.dungeons.shop.swords;
 
+import net.defade.dungeons.difficulty.GameDifficulty;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemHideFlag;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.tag.Tag;
+import net.minestom.server.tag.TagReadable;
+import net.minestom.server.tag.TagSerializer;
+import net.minestom.server.tag.TagWritable;
 import java.util.List;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
 
-public class Sword {
-    public static Tag<Integer> ATTACK_DAMAGE_TAG = Tag.Integer("AttackDamage");
-    public static Tag<Float> ATTACK_SPEED_TAG = Tag.Float("AttackSpeed");
-    public static Tag<Float> MOVEMENT_SPEED_MODIFIER_TAG = Tag.Float("MovementSpeedModifier");
-    public static Tag<Integer> DURABILITY_TAG = Tag.Integer("Durability");
-    public static Tag<Boolean> CAN_SWEEP_TAG = Tag.Boolean("CanSweep").defaultValue(false);
+public class Sword extends SwordConfig {
+    private static final Tag<Integer> SWORD_TYPE_TAG = Tag.Integer("SwordType");
+    private static final Tag<String> SWORD_MATERIAL_TAG = Tag.String("SwordMaterial");
+    private static final Tag<Component> SWORD_NAME_TAG = Tag.Component("SwordName");
+    private static final Tag<Integer> PRICE_TAG = Tag.Integer("Price");
+    private static final Tag<Integer> ATTACK_DAMAGE_TAG = Tag.Integer("AttackDamage");
+    private static final Tag<Float> ATTACK_SPEED_TAG = Tag.Float("AttackSpeed");
+    private static final Tag<Float> MOVEMENT_SPEED_MODIFIER_TAG = Tag.Float("MovementSpeedModifier");
+    private static final Tag<Integer> MAX_DURABILITY_TAG = Tag.Integer("MaxDurability");
+    private static final Tag<Boolean> CAN_SWEEP_TAG = Tag.Boolean("CanSweep").defaultValue(false);
 
-    private final SwordType swordType;
-    private final Material material;
-    private final Component name;
-    private final int price;
-    private final int attackDamage;
-    private final float attackSpeed;
-    private final float movementSpeedModifier;
-    private final int durability;
-    private final boolean canSweep;
-    private Sword nextSword;
+    public static final TagSerializer<Sword> SWORD_TAG_SERIALIZER = new TagSerializer<>() {
+        @Override
+        public Sword read(TagReadable reader) {
+            return new Sword(SwordType.values()[reader.getTag(SWORD_TYPE_TAG)], Material.fromNamespaceId(reader.getTag(SWORD_MATERIAL_TAG)),
+                    reader.getTag(SWORD_NAME_TAG), reader.getTag(PRICE_TAG), reader.getTag(ATTACK_DAMAGE_TAG), reader.getTag(ATTACK_SPEED_TAG),
+                    reader.getTag(MOVEMENT_SPEED_MODIFIER_TAG), reader.getTag(MAX_DURABILITY_TAG), reader.getTag(CAN_SWEEP_TAG));
+        }
 
-    public Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int durability, boolean canSweep) {
-        this.swordType = swordType;
-        this.material = material;
-        this.name = name;
-        this.price = price;
-        this.attackDamage = attackDamage;
-        this.attackSpeed = attackSpeed;
-        this.movementSpeedModifier = movementSpeedModifier;
-        this.durability = durability;
-        this.canSweep = canSweep;
+        @Override
+        public void write(TagWritable writer, Sword value) {
+            writer.setTag(SWORD_TYPE_TAG, value.getSwordType().ordinal());
+            writer.setTag(SWORD_MATERIAL_TAG, value.getMaterial().name());
+            writer.setTag(SWORD_NAME_TAG, value.getName());
+            writer.setTag(PRICE_TAG, value.getPrice());
+            writer.setTag(ATTACK_DAMAGE_TAG, value.getAttackDamage());
+            writer.setTag(ATTACK_SPEED_TAG, value.getAttackSpeed());
+            writer.setTag(MOVEMENT_SPEED_MODIFIER_TAG, value.getMovementSpeedModifier());
+            writer.setTag(MAX_DURABILITY_TAG, value.getMaxDurability());
+            writer.setTag(CAN_SWEEP_TAG, value.canSweep());
+        }
+    };
+
+    public static Tag<Sword> SWORD_TAG = Tag.Structure("Sword", SWORD_TAG_SERIALIZER);
+
+    public Sword(GameDifficulty gameDifficulty, SwordType swordType, Material material, Component name, int price, int attackDamage,
+                 float attackSpeed, float movementSpeedModifier, int maxDurability, boolean canSweep) {
+        super(swordType, material, name, (int) Math.ceil(price * gameDifficulty.priceMultiplier()), attackDamage, attackSpeed,
+                movementSpeedModifier, maxDurability, canSweep);
     }
 
-    public SwordType getSwordType() {
-        return swordType;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    public Component getName() {
-        return name;
-    }
-
-    public int getPrice(float multiplier) {
-        return (int) Math.ceil(price * multiplier);
-    }
-
-    public int getAttackDamage() {
-        return attackDamage;
-    }
-
-    public float getAttackSpeed() {
-        return attackSpeed;
-    }
-
-    public float getMovementSpeedModifier() {
-        return movementSpeedModifier;
-    }
-
-    public int getDurability() {
-        return durability;
-    }
-
-    public boolean canSweep() {
-        return canSweep;
-    }
-
-    public Sword getNextSword() {
-        return nextSword;
-    }
-
-    protected void setNextSword(Sword nextSword) {
-        this.nextSword = nextSword;
+    private Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int maxDurability, boolean canSweep) {
+        super(swordType, material, name, price, attackDamage, attackSpeed, movementSpeedModifier, maxDurability, canSweep);
     }
 
     public ItemStack getAsItemStack() { //TODO: Add enchants and power ups here
-        NamedTextColor color = swordType == SwordType.SWORD ? GREEN : YELLOW;
+        NamedTextColor color = getSwordType() == SwordType.SWORD ? GREEN : YELLOW;
 
         return ItemStack.builder(getMaterial())
                 .displayName(getName())
                 .lore(List.of(
                         text("Damage: ").color(GRAY).append(text(getAttackDamage()).color(color)).decoration(ITALIC, false),
-                        text("Durability: ").color(GRAY).append(text(getDurability()).color(color)).decoration(ITALIC, false),
+                        text("Durability: ").color(GRAY).append(text(getMaxDurability()).color(color)).decoration(ITALIC, false),
                         text("Atk Speed: ").color(GRAY).append(text(getAttackSpeed()).color(color)).decoration(ITALIC, false),
                         text("Movement Speed: ").color(GRAY).append(text((getMovementSpeedModifier() < 0 ? "" : "+") + getMovementSpeedModifier() + "%")
                                 .color(getMovementSpeedModifier() < 0 ? RED : GREEN)).decoration(ITALIC, false),
@@ -101,11 +76,7 @@ public class Sword {
                         text(""),
                         text("Type: ").color(GRAY).append(getSwordType().getName().color(color)).decoration(ITALIC, false)
                 ))
-                .set(ATTACK_DAMAGE_TAG, getAttackDamage())
-                .set(ATTACK_SPEED_TAG, getAttackSpeed())
-                .set(MOVEMENT_SPEED_MODIFIER_TAG, getMovementSpeedModifier())
-                .set(DURABILITY_TAG, getDurability())
-                .set(CAN_SWEEP_TAG, canSweep())
+                .set(SWORD_TAG, this)
                 .meta(builder -> builder.hideFlag(ItemHideFlag.HIDE_ATTRIBUTES))
                 .build();
     }

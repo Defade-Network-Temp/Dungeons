@@ -91,20 +91,22 @@ public class FightHandler {
         });
     }
 
-    private void refreshSwordAttributesForPlayer(Player player, ItemStack sword) {
-        if (sword.hasTag(Sword.MOVEMENT_SPEED_MODIFIER_TAG)) {
+    private void refreshSwordAttributesForPlayer(Player player, ItemStack swordItem) {
+        Sword sword = swordItem.hasTag(Sword.SWORD_TAG) ? swordItem.getTag(Sword.SWORD_TAG) : null;
+
+        if (sword != null) {
             player.getAttribute(Attribute.MOVEMENT_SPEED).addModifier(new AttributeModifier(
                     SWORD_MOVEMENT_SPEED_MODIFIER_UUID,
                     "Sword movement speed",
-                    sword.getTag(Sword.MOVEMENT_SPEED_MODIFIER_TAG) / 100,
+                    sword.getMovementSpeedModifier() / 100,
                     AttributeOperation.MULTIPLY_BASE
             ));
         } else {
             player.getAttribute(Attribute.MOVEMENT_SPEED).removeModifier(SWORD_MOVEMENT_SPEED_MODIFIER_UUID);
         }
 
-        if (sword.hasTag(Sword.ATTACK_SPEED_TAG)) {
-            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(sword.getTag(Sword.ATTACK_SPEED_TAG));
+        if (sword != null) {
+            player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(sword.getAttackSpeed());
         } else {
             player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(4.0f);
         }
@@ -139,9 +141,10 @@ public class FightHandler {
             if (!(event.getTarget() instanceof DungeonsEntity target)) return;
 
             if (event.getEntity() instanceof Player attacker) {
-                ItemStack sword = attacker.getItemInMainHand();
-                if (sword.hasTag(Sword.ATTACK_DAMAGE_TAG)) {
-                    float attackDamage = sword.getTag(Sword.ATTACK_DAMAGE_TAG) * (1 - target.getDamageResistance() * 0.01F);
+                ItemStack swordItem = attacker.getItemInMainHand();
+                Sword sword = swordItem.hasTag(Sword.SWORD_TAG) ? swordItem.getTag(Sword.SWORD_TAG) : null;
+                if (sword != null) {
+                    float attackDamage = sword.getAttackDamage() * (1 - target.getDamageResistance() * 0.01F);
 
                     float attackStrength = this.getAttackStrengthScale(attacker);
                     resetAttackStrengthTicker(attacker);
@@ -154,7 +157,7 @@ public class FightHandler {
                         }
 
                         boolean critical = hasEnoughStrength && attacker.getGravityTickCount() > 0.0F && !attacker.isOnGround() && !isPlayerOnClimbable(attacker) && !isPlayerInWater(attacker) && !attacker.isSprinting();
-                        boolean sweeping = sword.getTag(Sword.CAN_SWEEP_TAG) && hasEnoughStrength && !critical && attacker.isOnGround() && !attacker.isSprinting();
+                        boolean sweeping = sword.canSweep() && hasEnoughStrength && !critical && attacker.isOnGround() && !attacker.isSprinting();
 
                         double xDiff = attacker.getPosition().x() - target.getPosition().x();
 

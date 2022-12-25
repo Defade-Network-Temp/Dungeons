@@ -6,48 +6,35 @@ import net.minestom.server.tag.TagReadable;
 import net.minestom.server.tag.TagSerializer;
 import net.minestom.server.tag.TagWritable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public enum SwordType {
     SWORD(Component.text("Sword"), Tag.Structure("Sword", new TagSerializer<>() {
         @Override
-        public @Nullable Sword read(@NotNull TagReadable reader) {
-            return Swords.valueOf(reader.getTag(Tag.String("Sword"))).getSword();
+        public Swords read(@NotNull TagReadable reader) {
+            return Swords.valueOf(reader.getTag(Tag.String("Sword")));
         }
 
         @Override
-        public void write(@NotNull TagWritable writer, @NotNull Sword value) {
-            writer.setTag(Tag.String("Sword"), value.toString());
+        public void write(@NotNull TagWritable writer, @NotNull Swords value) {
+            writer.setTag(Tag.String("Sword"), value.name());
         }
     })),
-    BROADSWORD(Component.text("Broadsword"), Tag.Structure("BroadSword", new TagSerializer<>() {
+    BROADSWORD(Component.text("Broadsword"), Tag.Structure("Broadsword", new TagSerializer<>() {
         @Override
-        public @Nullable Sword read(@NotNull TagReadable reader) {
-            return Swords.valueOf(reader.getTag(Tag.String("BroadSword"))).getSword();
+        public Swords read(@NotNull TagReadable reader) {
+            return Swords.valueOf(reader.getTag(Tag.String("Broadsword")));
         }
 
         @Override
-        public void write(@NotNull TagWritable writer, @NotNull Sword value) {
-            writer.setTag(Tag.String("BroadSword"), value.toString());
+        public void write(@NotNull TagWritable writer, @NotNull Swords value) {
+            writer.setTag(Tag.String("Broadsword"), value.name());
         }
     }));
 
-    public final static Tag<SwordType> SWORD_TYPE_TAG = Tag.Structure("SwordType", new TagSerializer<>() {
-        @Override
-        public SwordType read(@NotNull TagReadable reader) {
-            return SwordType.valueOf(reader.getTag(Tag.String("SwordType")));
-        }
-
-        @Override
-        public void write(@NotNull TagWritable writer, @NotNull SwordType value) {
-            writer.setTag(Tag.String("SwordType"), value.toString());
-        }
-    });
-
     private final Component name;
-    private final Tag<Sword> swordTag;
+    private final Tag<Swords> swordTag;
 
-    SwordType(Component name, Tag<Sword> swordTag) {
+    SwordType(Component name, Tag<Swords> swordTag) {
         this.name = name;
         this.swordTag = swordTag;
     }
@@ -56,7 +43,7 @@ public enum SwordType {
         return name;
     }
 
-    public Tag<Sword> getSwordTag() {
+    public Tag<Swords> getSwordTag() {
         return swordTag;
     }
 }

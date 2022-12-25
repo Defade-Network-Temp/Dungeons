@@ -92,8 +92,8 @@ public class GameInstance extends InstanceContainer {
         setAcceptsPlayers(false);
         this.difficulty = config.getDifficulty(difficulty);
 
-        getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_BROADSWORD.getSword()));
-        getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_SWORD.getSword()));
+        getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_BROADSWORD));
+        getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_SWORD));
         getPlayers().forEach(Armors.NOTHING::equipForPlayer);
 
         waveManager = new WaveManager(this, config.getWaveConfig(difficulty).getWaves());

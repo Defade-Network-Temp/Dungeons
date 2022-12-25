@@ -1,5 +1,6 @@
 package net.defade.dungeons.gui.shop;
 
+import net.defade.dungeons.difficulty.GameDifficulty;
 import net.defade.dungeons.game.CoinsManager;
 import net.defade.dungeons.game.GameInstance;
 import net.defade.dungeons.shop.swords.Sword;
@@ -25,7 +26,7 @@ public class SwordShopGUI extends Inventory {
     private final Map<Integer, Runnable> slotsActions = new HashMap<>();
     private final CoinsManager coinsManager;
     private final Player player;
-    private final float priceMultiplier;
+    private final GameDifficulty gameDifficulty;
 
     public SwordShopGUI(CoinsManager coinsManager, Player player) {
         super(InventoryType.CHEST_5_ROW, Component.text("Shop > Épées"));
@@ -33,16 +34,17 @@ public class SwordShopGUI extends Inventory {
         this.player = player;
 
         GameInstance gameInstance = (GameInstance) player.getInstance();
-        priceMultiplier = gameInstance != null ? gameInstance.getDifficulty().priceMultiplier() : 1.0f;
+        if(gameInstance == null) {
+            throw new NullPointerException("GameInstance is null.");
+        }
+        this.gameDifficulty = gameInstance.getDifficulty();
 
         for (int slot = 0; slot < getSize(); slot++) {
             setItemStack(slot, ItemList.INVENTORY_FILLER);
         }
 
-        SwordType playerCurrentSwordType = player.getTag(SwordType.SWORD_TYPE_TAG);
-
-        fillSword(Swords.WOODEN_SWORD.getSword(), playerCurrentSwordType, player.getTag(SwordType.SWORD.getSwordTag()), 10);
-        fillSword(Swords.WOODEN_BROADSWORD.getSword(), playerCurrentSwordType, player.getTag(SwordType.BROADSWORD.getSwordTag()), 28);
+        fillSword(Swords.WOODEN_SWORD, player.getTag(SwordType.SWORD.getSwordTag()), 10);
+        fillSword(Swords.WOODEN_BROADSWORD, player.getTag(SwordType.BROADSWORD.getSwordTag()), 28);
 
         addInventoryCondition((playerClicking, slot, clickType, inventoryConditionResult) -> {
             inventoryConditionResult.setCancel(true);
@@ -55,8 +57,9 @@ public class SwordShopGUI extends Inventory {
         });
     }
 
-    private ItemStack formatSword(int slot, Sword sword, boolean hasBoughtSword, boolean isEquipped, boolean canEquip, boolean canBuy, boolean hasEnoughCoins) {
-        ItemStack itemStack = sword.getAsItemStack();
+    private ItemStack formatSword(int slot, Swords sword, boolean hasBoughtSword, boolean isEquipped, boolean canEquip, boolean canBuy, boolean hasEnoughCoins) {
+        Sword swordToEquip = sword.getSword(gameDifficulty);
+        ItemStack itemStack = swordToEquip.getAsItemStack();
         if(isEquipped) {
             List<Component> lore = new ArrayList<>(itemStack.getLore());
             lore.add(text(""));
@@ -89,12 +92,12 @@ public class SwordShopGUI extends Inventory {
             itemStack = itemStack.withLore(lore);
 
             slotsActions.put(slot, () -> {
-                if(!coinsManager.hasEnoughCoins(player, sword.getPrice(priceMultiplier))) {
+                if(!coinsManager.hasEnoughCoins(player, swordToEquip.getPrice())) {
                     player.sendMessage(text("Vous n'avez pas assez d'argent.").color(RED));
-                    return;
+                    //return;
                 }
 
-                coinsManager.removeCoins(player, sword.getPrice(priceMultiplier));
+                coinsManager.removeCoins(player, swordToEquip.getPrice());
                 Swords.equipSwordForPlayer(player, sword);
             });
         } else {
@@ -111,14 +114,15 @@ public class SwordShopGUI extends Inventory {
         return itemStack;
     }
 
-    private void fillSword(Sword sword, SwordType playerCurrentSwordType, Sword currentPlayerSword, int slot) {
+    private void fillSword(Swords sword, Swords currentPlayerSword, int slot) {
         boolean canBuy = false;
         boolean hasBought = true;
 
         while (sword != null) {
+            Sword swordToEquip = sword.getSword(gameDifficulty);
             setItemStack(slot, formatSword(slot, sword, hasBought,
-                    currentPlayerSword == sword && currentPlayerSword.getSwordType() == playerCurrentSwordType,
-                    currentPlayerSword == sword, canBuy, coinsManager.hasEnoughCoins(player, sword.getPrice(priceMultiplier))));
+                    currentPlayerSword == sword,
+                    currentPlayerSword == sword, canBuy, coinsManager.hasEnoughCoins(player, swordToEquip.getPrice())));
             if(slot == 12 || slot == 30) slot++; // Add a margin
             slot++;
 
