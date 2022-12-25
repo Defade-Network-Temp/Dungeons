@@ -33,7 +33,7 @@ public class SwordShopGUI extends Inventory {
         this.player = player;
 
         GameInstance gameInstance = (GameInstance) player.getInstance();
-        priceMultiplier = gameInstance != null ? gameInstance.getConfig().getPriceMultiplier(gameInstance.getDifficulty()) : 1.0f;
+        priceMultiplier = gameInstance != null ? gameInstance.getDifficulty().priceMultiplier() : 1.0f;
 
         for (int slot = 0; slot < getSize(); slot++) {
             setItemStack(slot, ItemList.INVENTORY_FILLER);

@@ -305,7 +305,7 @@ public class FightHandler {
                     player.sendMessage(Component.text("Ne vous éloignez pas trop de vos équipiers!", NamedTextColor.RED));
                 }
 
-                int timeLeft = switch (gameInstance.getDifficulty()) {
+                int timeLeft = switch (gameInstance.getDifficulty().difficulty()) {
                     case NORMAL -> 40 * 1000;
                     case HARD -> 50 * 1000;
                     case INSANE -> Integer.MAX_VALUE; // No respawn for you!
@@ -324,7 +324,7 @@ public class FightHandler {
             Player player = event.getPlayer();
             deadPlayers.put(player, System.currentTimeMillis());
 
-            int lostCoins = (int) (gameInstance.getCoinsManager().getCoins(player) * switch (gameInstance.getDifficulty()) {
+            int lostCoins = (int) (gameInstance.getCoinsManager().getCoins(player) * switch (gameInstance.getDifficulty().difficulty()) {
                 case NORMAL -> 0.10;
                 case HARD -> 0.25;
                 case INSANE -> 0.50;

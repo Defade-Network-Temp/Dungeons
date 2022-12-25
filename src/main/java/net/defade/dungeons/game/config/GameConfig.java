@@ -1,6 +1,7 @@
 package net.defade.dungeons.game.config;
 
 import net.defade.dungeons.difficulty.Difficulty;
+import net.defade.dungeons.difficulty.GameDifficulty;
 import net.minestom.server.coordinate.Pos;
 import org.json.JSONObject;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ public class GameConfig {
     private final JSONObject jsonConfig;
     private final Pos spawnPoint;
 
-    private final Map<Difficulty, Double> spawnMultiplier = new HashMap<>();
+    private final Map<Difficulty, Float> spawnMultiplier = new HashMap<>();
     private final Map<Difficulty, Float> damageMultiplier = new HashMap<>();
     private final Map<Difficulty, Float> healthMultiplier = new HashMap<>();
     private final Map<Difficulty, Float> priceMultiplier = new HashMap<>();
@@ -22,7 +23,7 @@ public class GameConfig {
 
         JSONObject spawnMultiplierObject = jsonConfig.getJSONObject("SpawnMultiplier");
         for(Difficulty difficulty : Difficulty.values()) {
-            spawnMultiplier.put(difficulty, spawnMultiplierObject.getDouble(difficulty.toString()));
+            spawnMultiplier.put(difficulty, spawnMultiplierObject.getFloat(difficulty.toString()));
         }
 
         JSONObject damageMultiplierObject = jsonConfig.getJSONObject("DamageMultiplier");
@@ -45,24 +46,13 @@ public class GameConfig {
         return spawnPoint;
     }
 
-    public double getSpawnMultiplier(Difficulty difficulty) {
-        return spawnMultiplier.get(difficulty);
-    }
-
-    public float getDamageMultiplier(Difficulty difficulty) {
-        return damageMultiplier.get(difficulty);
-    }
-
-    public float getHealthMultiplier(Difficulty difficulty) {
-        return healthMultiplier.get(difficulty);
-    }
-
-    public float getPriceMultiplier(Difficulty difficulty) {
-        return priceMultiplier.get(difficulty);
+    public GameDifficulty getDifficulty(Difficulty difficulty) {
+        return new GameDifficulty(difficulty, spawnMultiplier.get(difficulty), damageMultiplier.get(difficulty),
+                healthMultiplier.get(difficulty), priceMultiplier.get(difficulty));
     }
 
     public WaveConfig getWaveConfig(Difficulty difficulty) {
-        return new WaveConfig(jsonConfig.getJSONArray("waves"), getSpawnMultiplier(difficulty));
+        return new WaveConfig(jsonConfig.getJSONArray("waves"), spawnMultiplier.get(difficulty));
     }
 
     private static Pos getPos(JSONObject jsonObject) {

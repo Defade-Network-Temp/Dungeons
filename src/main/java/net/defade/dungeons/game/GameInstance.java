@@ -1,6 +1,7 @@
 package net.defade.dungeons.game;
 
 import net.defade.dungeons.difficulty.Difficulty;
+import net.defade.dungeons.difficulty.GameDifficulty;
 import net.defade.dungeons.game.config.GameConfig;
 import net.defade.dungeons.game.utils.AmethystMapSource;
 import net.defade.dungeons.pvp.FightHandler;
@@ -29,7 +30,7 @@ public class GameInstance extends InstanceContainer {
 
     private final GameEvents gameEvents = new GameEvents(this, MinecraftServer.getGlobalEventHandler());
 
-    private Difficulty difficulty;
+    private GameDifficulty difficulty;
 
     private WaveManager waveManager;
     private final FightHandler fightHandler = new FightHandler(this);
@@ -89,7 +90,7 @@ public class GameInstance extends InstanceContainer {
 
     public void start(Difficulty difficulty) {
         setAcceptsPlayers(false);
-        this.difficulty = difficulty;
+        this.difficulty = config.getDifficulty(difficulty);
 
         getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_BROADSWORD.getSword()));
         getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_SWORD.getSword()));
@@ -111,7 +112,7 @@ public class GameInstance extends InstanceContainer {
         return config;
     }
 
-    public Difficulty getDifficulty() {
+    public GameDifficulty getDifficulty() {
         return difficulty;
     }
 
