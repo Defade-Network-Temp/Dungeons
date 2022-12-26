@@ -25,6 +25,7 @@ public class Sword extends SwordConfig {
     private static final Tag<Float> ATTACK_SPEED_TAG = Tag.Float("AttackSpeed");
     private static final Tag<Float> MOVEMENT_SPEED_MODIFIER_TAG = Tag.Float("MovementSpeedModifier");
     private static final Tag<Integer> MAX_DURABILITY_TAG = Tag.Integer("MaxDurability");
+    private static final Tag<Integer> DURABILITY_TAG = Tag.Integer("Durability");
     private static final Tag<Boolean> CAN_SWEEP_TAG = Tag.Boolean("CanSweep").defaultValue(false);
 
     public static final TagSerializer<Sword> SWORD_TAG_SERIALIZER = new TagSerializer<>() {
@@ -32,7 +33,8 @@ public class Sword extends SwordConfig {
         public Sword read(TagReadable reader) {
             return new Sword(SwordType.values()[reader.getTag(SWORD_TYPE_TAG)], Material.fromNamespaceId(reader.getTag(SWORD_MATERIAL_TAG)),
                     reader.getTag(SWORD_NAME_TAG), reader.getTag(PRICE_TAG), reader.getTag(ATTACK_DAMAGE_TAG), reader.getTag(ATTACK_SPEED_TAG),
-                    reader.getTag(MOVEMENT_SPEED_MODIFIER_TAG), reader.getTag(MAX_DURABILITY_TAG), reader.getTag(CAN_SWEEP_TAG));
+                    reader.getTag(MOVEMENT_SPEED_MODIFIER_TAG), reader.getTag(MAX_DURABILITY_TAG), reader.getTag(DURABILITY_TAG),
+                    reader.getTag(CAN_SWEEP_TAG));
         }
 
         @Override
@@ -45,20 +47,32 @@ public class Sword extends SwordConfig {
             writer.setTag(ATTACK_SPEED_TAG, value.getAttackSpeed());
             writer.setTag(MOVEMENT_SPEED_MODIFIER_TAG, value.getMovementSpeedModifier());
             writer.setTag(MAX_DURABILITY_TAG, value.getMaxDurability());
+            writer.setTag(DURABILITY_TAG, value.getDurability());
             writer.setTag(CAN_SWEEP_TAG, value.canSweep());
         }
     };
 
     public static Tag<Sword> SWORD_TAG = Tag.Structure("Sword", SWORD_TAG_SERIALIZER);
 
+    private int durability = getMaxDurability();
+
     public Sword(GameDifficulty gameDifficulty, SwordType swordType, Material material, Component name, int price, int attackDamage,
                  float attackSpeed, float movementSpeedModifier, int maxDurability, boolean canSweep) {
         super(swordType, material, name, (int) Math.ceil(price * gameDifficulty.priceMultiplier()), attackDamage, attackSpeed,
-                movementSpeedModifier, maxDurability, canSweep);
+                movementSpeedModifier, maxDurability - gameDifficulty.weaponDurabilityReducer(), canSweep);
     }
 
-    private Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int maxDurability, boolean canSweep) {
+    private Sword(SwordType swordType, Material material, Component name, int price, int attackDamage, float attackSpeed, float movementSpeedModifier, int maxDurability, int durability, boolean canSweep) {
         super(swordType, material, name, price, attackDamage, attackSpeed, movementSpeedModifier, maxDurability, canSweep);
+        this.durability = durability;
+    }
+
+    public int getDurability() {
+        return durability;
+    }
+
+    public void setDurability(int durability) {
+        this.durability = durability;
     }
 
     public ItemStack getAsItemStack() { //TODO: Add enchants and power ups here

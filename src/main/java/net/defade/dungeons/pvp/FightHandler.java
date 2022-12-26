@@ -6,8 +6,6 @@ import net.defade.dungeons.utils.GameEvents;
 import net.defade.dungeons.zombies.DungeonsEntity;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.attribute.AttributeModifier;
@@ -41,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static net.kyori.adventure.text.Component.*;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
+
 public class FightHandler {
     private static final UUID SWORD_MOVEMENT_SPEED_MODIFIER_UUID = UUID.fromString("7AB1E3FF-A61C-46AF-80F1-77A8B649F9E6");
     private static final AttributeModifier MOJANG_SPRINTING_MODIFIER = new AttributeModifier(UUID.fromString("662A6B8D-DA3E-4C1C-8813-96EA6097278D"),
@@ -66,6 +67,7 @@ public class FightHandler {
         registerAttackEvent();
         registerEntitySoundsEvent();
         registerDeathEvent();
+        registerSwordsDurabilityUpdateTicker();
     }
 
     public void stop() {
@@ -143,7 +145,7 @@ public class FightHandler {
             if (event.getEntity() instanceof Player attacker) {
                 ItemStack swordItem = attacker.getItemInMainHand();
                 Sword sword = swordItem.hasTag(Sword.SWORD_TAG) ? swordItem.getTag(Sword.SWORD_TAG) : null;
-                if (sword != null) {
+                if (sword != null && sword.getDurability() > 0) {
                     float attackDamage = sword.getAttackDamage() * (1 - target.getDamageResistance() * 0.01F);
 
                     float attackStrength = this.getAttackStrengthScale(attacker);
@@ -253,10 +255,20 @@ public class FightHandler {
 
                         // TODO attacker.causeFoodExhaustion(0.1F);
                     }
+
+                    sword.setDurability(sword.getDurability() - 1);
+                    attacker.getInventory().setItemStack(0, updateWeaponDurability(sword, swordItem.material().registry().maxDamage()));
+                } else {
+                    attacker.sendActionBar(
+                        text("» ").color(DARK_GRAY)
+                        .append(text("Votre épée est cassé. ").color(RED))
+                        .append(text("🗡 ").color(DARK_RED))
+                        .append((text("[SHIFT] pour la réparer. ")).color(RED))
+                        .append(text("«").color(DARK_GRAY))
+                    );
                 }
             }
         });
-
     }
 
     private void registerEntitySoundsEvent() {
@@ -305,7 +317,7 @@ public class FightHandler {
 
                 if (nearestPlayerPos != null) {
                     player.teleport(nearestPlayerPos);
-                    player.sendMessage(Component.text("Ne vous éloignez pas trop de vos équipiers!", NamedTextColor.RED));
+                    player.sendMessage(text("Ne vous éloignez pas trop de vos équipiers!", RED));
                 }
 
                 int timeLeft = switch (gameInstance.getDifficulty().difficulty()) {
@@ -332,8 +344,8 @@ public class FightHandler {
                 case HARD -> 0.25;
                 case INSANE -> 0.50;
             });
-            event.setChatMessage(player.getName().append(Component.text(" est mort !").color(NamedTextColor.RED))); // TODO do text formatting
-            player.sendMessage(Component.text("(-" + lostCoins + " coins)."));
+            event.setChatMessage(player.getName().append(text(" est mort !").color(RED))); // TODO do text formatting
+            player.sendMessage(text("(-" + lostCoins + " coins)."));
             gameInstance.getCoinsManager().removeCoins(player, lostCoins);
 
             player.setGameMode(GameMode.SPECTATOR);
@@ -342,6 +354,27 @@ public class FightHandler {
                 gameInstance.finishGame();
             }
         });
+    }
+
+    private void registerSwordsDurabilityUpdateTicker() {
+        tasks.add(gameInstance.scheduler().scheduleTask(() -> {
+            for (Player player : gameInstance.getPlayers()) {
+                if(player.isSneaking()) {
+                    ItemStack itemStack = player.getInventory().getItemStack(0);
+                    if(itemStack.hasTag(Sword.SWORD_TAG)) {
+                        Sword sword = itemStack.getTag(Sword.SWORD_TAG);
+                        if(sword.getDurability() < sword.getMaxDurability()) {
+                            sword.setDurability(sword.getDurability() + switch (gameInstance.getDifficulty().difficulty()) {
+                                case NORMAL, HARD -> 4;
+                                case INSANE -> 3;
+                            });
+
+                            player.getInventory().setItemStack(0, updateWeaponDurability(sword, itemStack.material().registry().maxDamage()));
+                        }
+                    }
+                }
+            }
+        }, TaskSchedule.immediate(), TaskSchedule.seconds(1)));
     }
 
     public boolean isDead(Player player) {
@@ -382,5 +415,14 @@ public class FightHandler {
     private static boolean isBlockInTag(Block block, String tagNamespace) {
         Tag blocksForTag = MinecraftServer.getTagManager().getTag(Tag.BasicType.BLOCKS, tagNamespace);
         return blocksForTag != null && blocksForTag.contains(block.namespace());
+    }
+
+    private static ItemStack updateWeaponDurability(Sword sword, int maxItemDamage) {
+        int durability = sword.getDurability();
+        int maxDurability = sword.getMaxDurability();
+
+        int itemDamage = maxItemDamage - (int) Math.ceil(maxItemDamage * (durability / (double) maxDurability));
+
+        return sword.getAsItemStack().withMeta(builder -> builder.damage(itemDamage == maxItemDamage ? maxItemDamage - 1 : itemDamage));
     }
 }

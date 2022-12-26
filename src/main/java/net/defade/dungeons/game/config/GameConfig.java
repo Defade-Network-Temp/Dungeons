@@ -15,6 +15,7 @@ public class GameConfig {
     private final Map<Difficulty, Float> damageMultiplier = new HashMap<>();
     private final Map<Difficulty, Float> healthMultiplier = new HashMap<>();
     private final Map<Difficulty, Float> priceMultiplier = new HashMap<>();
+    private final Map<Difficulty, Integer> weaponDifficultyReducer = new HashMap<>();
 
     public GameConfig(String config) {
         jsonConfig = new JSONObject(config);
@@ -40,6 +41,11 @@ public class GameConfig {
         for(Difficulty difficulty : Difficulty.values()) {
             priceMultiplier.put(difficulty, priceMultiplierObject.getFloat(difficulty.toString()));
         }
+
+        JSONObject weaponDifficultyReducerObject = jsonConfig.getJSONObject("WeaponDifficultyReducer");
+        for(Difficulty difficulty : Difficulty.values()) {
+            weaponDifficultyReducer.put(difficulty, weaponDifficultyReducerObject.getInt(difficulty.toString()));
+        }
     }
 
     public Pos getSpawnPoint() {
@@ -48,7 +54,8 @@ public class GameConfig {
 
     public GameDifficulty getDifficulty(Difficulty difficulty) {
         return new GameDifficulty(difficulty, spawnMultiplier.get(difficulty), damageMultiplier.get(difficulty),
-                healthMultiplier.get(difficulty), priceMultiplier.get(difficulty));
+                healthMultiplier.get(difficulty), priceMultiplier.get(difficulty),
+                weaponDifficultyReducer.get(difficulty));
     }
 
     public WaveConfig getWaveConfig(Difficulty difficulty) {
