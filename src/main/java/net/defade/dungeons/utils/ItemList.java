@@ -101,4 +101,12 @@ public class ItemList {
                     .append(text("(" + price + " coins)").color(GRAY)))
             .lore(minWave == -1 ? List.of() : List.of(Component.text("Débloquable à la vague " + minWave + ".").color(RED).decoration(ITALIC, false)))
             .build();
+
+    public static ItemStack LESS_INJURED_ZOMBIE_HEAD = ItemStack.builder(Material.PLAYER_HEAD)
+            .meta(PlayerHeadMeta.class, headMeta -> {
+                headMeta.skullOwner(UUID.randomUUID());
+                headMeta.playerSkin(new PlayerSkin("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3J" +
+                        "hZnQubmV0L3RleHR1cmUvYzNmYWI3NmY3MTgwOTJkNjRiN2IwMGRkYjcyOTMxYzBiMDVlOGNiYjY4NzEwNmMzYzZmMzU2MGY5MzNmOTkzMCJ9fX0=", ""));
+            })
+            .build();
 }

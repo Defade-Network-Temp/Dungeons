@@ -3,6 +3,7 @@ package net.defade.dungeons.waves;
 import net.defade.dungeons.zombies.DungeonsEntity;
 import net.defade.dungeons.zombies.classic.ZombieI;
 import net.defade.dungeons.zombies.classic.ZombieII;
+import net.defade.dungeons.zombies.classic.ZombieIII;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,6 +20,7 @@ public class Wave {
 
         if(zombieClass == ZombieI.class) return new ZombieI();
         if(zombieClass == ZombieII.class) return new ZombieII();
+        if(zombieClass == ZombieIII.class) return new ZombieIII();
         throw new NoSuchElementException("The class " + zombieClass.getCanonicalName() + " has no supplier.");
     }
 
