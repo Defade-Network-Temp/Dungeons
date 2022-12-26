@@ -28,6 +28,7 @@ import net.minestom.server.event.player.PlayerStopSprintingEvent;
 import net.minestom.server.gamedata.tags.Tag;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import net.minestom.server.network.packet.server.play.EntityAnimationPacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.particle.ParticleCreator;
@@ -257,7 +258,7 @@ public class FightHandler {
                     }
 
                     sword.setDurability(sword.getDurability() - 1);
-                    attacker.getInventory().setItemStack(0, updateWeaponDurability(sword, swordItem.material().registry().maxDamage()));
+                    attacker.getInventory().setItemStack(0, updateWeaponDurability(sword));
                 } else {
                     attacker.sendActionBar(
                         text("» ").color(DARK_GRAY)
@@ -369,7 +370,7 @@ public class FightHandler {
                                 case INSANE -> 3;
                             });
 
-                            player.getInventory().setItemStack(0, updateWeaponDurability(sword, itemStack.material().registry().maxDamage()));
+                            player.getInventory().setItemStack(0, updateWeaponDurability(sword));
                         }
                     }
                 }
@@ -417,12 +418,18 @@ public class FightHandler {
         return blocksForTag != null && blocksForTag.contains(block.namespace());
     }
 
-    private static ItemStack updateWeaponDurability(Sword sword, int maxItemDamage) {
+    private static ItemStack updateWeaponDurability(Sword sword) {
+        int maxItemDamage = sword.getMaterial().registry().maxDamage();
         int durability = sword.getDurability();
         int maxDurability = sword.getMaxDurability();
 
         int itemDamage = maxItemDamage - (int) Math.ceil(maxItemDamage * (durability / (double) maxDurability));
 
-        return sword.getAsItemStack().withMeta(builder -> builder.damage(itemDamage == maxItemDamage ? maxItemDamage - 1 : itemDamage));
+        ItemStack itemStack = sword.getAsItemStack().withMeta(builder -> builder.damage(itemDamage == maxItemDamage ? maxItemDamage - 1 : itemDamage));
+        if(durability == 0) {
+            itemStack = itemStack.withMaterial(Material.STICK);
+        }
+
+        return itemStack;
     }
 }
