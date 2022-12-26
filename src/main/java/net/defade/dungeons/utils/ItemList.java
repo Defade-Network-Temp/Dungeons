@@ -109,4 +109,12 @@ public class ItemList {
                         "hZnQubmV0L3RleHR1cmUvYzNmYWI3NmY3MTgwOTJkNjRiN2IwMGRkYjcyOTMxYzBiMDVlOGNiYjY4NzEwNmMzYzZmMzU2MGY5MzNmOTkzMCJ9fX0=", ""));
             })
             .build();
+
+    public static ItemStack INJURED_ZOMBIE_HEAD = ItemStack.builder(Material.PLAYER_HEAD)
+            .meta(PlayerHeadMeta.class, playerHeadMeta -> {
+                playerHeadMeta.skullOwner(UUID.randomUUID());
+                playerHeadMeta.playerSkin(new PlayerSkin("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5l" +
+                        "Y3JhZnQubmV0L3RleHR1cmUvZmFhYzIyMzAxNTlhODAzZDI4Y2ZkZTY2NjJlYWYzNzlkYTg5YThhMDczYzdiZTIwYzZlN2U0MDhkZDg4NjFkMSJ9fX0=", ""));
+            })
+            .build();
 }
