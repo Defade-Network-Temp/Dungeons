@@ -125,4 +125,12 @@ public class ItemList {
                         "hZnQubmV0L3RleHR1cmUvNDVlOTZlMTJjN2ZhZTcwZjU0Mjc4ZGUxODA5YjM4OGExNjcyZjM5YmFiYTM0YTI5ODYxNDRmZTJkNjJiNTBmYSJ9fX0=", ""));
             })
             .build();
+
+    public static ItemStack VERY_BLOODY_HEAD = ItemStack.builder(Material.PLAYER_HEAD)
+            .meta(PlayerHeadMeta.class, playerHeadMeta -> {
+                playerHeadMeta.skullOwner(UUID.randomUUID());
+                playerHeadMeta.playerSkin(new PlayerSkin("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZn" +
+                        "QubmV0L3RleHR1cmUvZWE5OWYxYmQ1MWI1ZDMzYjg1YWVhZTVhN2NmZDU0ZGI2MGQyNWY5ZmRlMGJkODkzZmQ5NDliYmZhM2Q4ZDc3MSJ9fX0=", ""));
+            })
+            .build();
 }
