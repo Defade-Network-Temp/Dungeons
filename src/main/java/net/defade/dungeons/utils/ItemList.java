@@ -117,4 +117,12 @@ public class ItemList {
                         "Y3JhZnQubmV0L3RleHR1cmUvZmFhYzIyMzAxNTlhODAzZDI4Y2ZkZTY2NjJlYWYzNzlkYTg5YThhMDczYzdiZTIwYzZlN2U0MDhkZDg4NjFkMSJ9fX0=", ""));
             })
             .build();
+
+    public static ItemStack BLOOD_ZOMBIE_HEAD = ItemStack.builder(Material.PLAYER_HEAD)
+            .meta(PlayerHeadMeta.class, playerHeadMeta -> {
+                playerHeadMeta.skullOwner(UUID.randomUUID());
+                playerHeadMeta.playerSkin(new PlayerSkin("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3J" +
+                        "hZnQubmV0L3RleHR1cmUvNDVlOTZlMTJjN2ZhZTcwZjU0Mjc4ZGUxODA5YjM4OGExNjcyZjM5YmFiYTM0YTI5ODYxNDRmZTJkNjJiNTBmYSJ9fX0=", ""));
+            })
+            .build();
 }
