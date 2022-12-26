@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.entity.Player;
 import net.minestom.server.item.Material;
+import net.minestom.server.tag.Tag;
 
 import static net.defade.dungeons.shop.swords.SwordType.*;
 
@@ -59,6 +60,7 @@ public enum Swords {
         if(gameInstance != null) {
             Sword swordToEquip = sword.getSword(gameInstance.getDifficulty());
 
+            player.setTag(SWORD_TYPE_TAG, swordToEquip.getSwordType());
             player.setTag(swordToEquip.getSwordType().getSwordTag(), sword);
             player.getInventory().setItemStack(0, swordToEquip.getAsItemStack());
         }

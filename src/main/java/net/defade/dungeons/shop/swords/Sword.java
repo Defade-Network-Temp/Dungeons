@@ -86,7 +86,7 @@ public class Sword extends SwordConfig {
                         text("Atk Speed: ").color(GRAY).append(text(getAttackSpeed()).color(color)).decoration(ITALIC, false),
                         text("Movement Speed: ").color(GRAY).append(text((getMovementSpeedModifier() < 0 ? "" : "+") + getMovementSpeedModifier() + "%")
                                 .color(getMovementSpeedModifier() < 0 ? RED : GREEN)).decoration(ITALIC, false),
-                        text("Sweep Activé: ").color(GRAY).append(text(canSweep() ? "Oui" : "Non").color(canSweep() ? GREEN : RED)).decoration(ITALIC, false),
+                        text("Sweep: ").color(GRAY).append(text(canSweep() ? "✔" : "❌").color(canSweep() ? GREEN : RED)).decoration(ITALIC, false),
                         text(""),
                         text("Type: ").color(GRAY).append(getSwordType().getName().color(color)).decoration(ITALIC, false)
                 ))

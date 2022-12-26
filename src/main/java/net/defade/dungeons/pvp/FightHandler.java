@@ -259,7 +259,7 @@ public class FightHandler {
 
                     sword.setDurability(sword.getDurability() - 1);
                     attacker.getInventory().setItemStack(0, updateWeaponDurability(sword));
-                } else {
+                } else if (sword != null && sword.getDurability() <= 0){
                     attacker.sendActionBar(
                         text("» ").color(DARK_GRAY)
                         .append(text("Votre épée est cassé. ").color(RED))

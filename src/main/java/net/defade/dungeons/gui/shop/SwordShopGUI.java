@@ -43,8 +43,8 @@ public class SwordShopGUI extends Inventory {
             setItemStack(slot, ItemList.INVENTORY_FILLER);
         }
 
-        fillSword(Swords.WOODEN_SWORD, player.getTag(SwordType.SWORD.getSwordTag()), 10);
-        fillSword(Swords.WOODEN_BROADSWORD, player.getTag(SwordType.BROADSWORD.getSwordTag()), 28);
+        fillSword(Swords.WOODEN_SWORD, player.getTag(SwordType.SWORD_TYPE_TAG), player.getTag(SwordType.SWORD.getSwordTag()), 10);
+        fillSword(Swords.WOODEN_BROADSWORD, player.getTag(SwordType.SWORD_TYPE_TAG), player.getTag(SwordType.BROADSWORD.getSwordTag()), 28);
 
         addInventoryCondition((playerClicking, slot, clickType, inventoryConditionResult) -> {
             inventoryConditionResult.setCancel(true);
@@ -86,7 +86,7 @@ public class SwordShopGUI extends Inventory {
             if(hasEnoughCoins) {
                 lore.add(text("Cliquez pour acheter").color(YELLOW).decoration(ITALIC, false));
             } else {
-                lore.add(text("Pas assez d'argent.").color(RED));
+                lore.add(text("Pas assez d'argent.").color(RED).decoration(ITALIC, false));
             }
 
             itemStack = itemStack.withLore(lore);
@@ -114,14 +114,14 @@ public class SwordShopGUI extends Inventory {
         return itemStack;
     }
 
-    private void fillSword(Swords sword, Swords currentPlayerSword, int slot) {
+    private void fillSword(Swords sword, SwordType playerCurrentSwordType, Swords currentPlayerSword, int slot) {
         boolean canBuy = false;
         boolean hasBought = true;
 
         while (sword != null) {
             Sword swordToEquip = sword.getSword(gameDifficulty);
             setItemStack(slot, formatSword(slot, sword, hasBought,
-                    currentPlayerSword == sword,
+                    currentPlayerSword == sword && playerCurrentSwordType == swordToEquip.getSwordType(),
                     currentPlayerSword == sword, canBuy, coinsManager.hasEnoughCoins(player, swordToEquip.getPrice())));
             if(slot == 12 || slot == 30) slot++; // Add a margin
             slot++;
