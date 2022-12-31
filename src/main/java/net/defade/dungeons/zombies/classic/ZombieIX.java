@@ -11,33 +11,33 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.LeatherArmorMeta;
 
-public class ZombieVIII extends DungeonsEntity {
-    private static final Color PURPLE_COLOR = new Color(138, 43, 226);
+public class ZombieIX extends DungeonsEntity {
+    private static final Color BLACk_COLOR = new Color(0, 0, 0);
 
-    public ZombieVIII() {
-        super(EntityType.ZOMBIE, "Lvl 8", 60, 1, 2 * 20, 20, 0.15, 20, 13);
+    public ZombieIX() {
+        super(EntityType.ZOMBIE, "Lvl 9", 68, 1, 2 * 20, 25, 0.15, 30, 15);
 
-        setHelmet(ItemList.CORRUPTED_HEAD);
+        setHelmet(ItemList.ENDER_CORRUPTED_HEAD);
         setChestplate(
                 ItemStack.builder(Material.LEATHER_CHESTPLATE)
                         .meta(LeatherArmorMeta.class, leatherArmorMeta -> {
-                            leatherArmorMeta.color(PURPLE_COLOR);
+                            leatherArmorMeta.color(BLACk_COLOR);
                         }).build()
         );
         setLeggings(
                 ItemStack.builder(Material.LEATHER_LEGGINGS)
                         .meta(LeatherArmorMeta.class, leatherArmorMeta -> {
-                            leatherArmorMeta.color(PURPLE_COLOR);
+                            leatherArmorMeta.color(BLACk_COLOR);
                         }).build()
         );
         setBoots(
                 ItemStack.builder(Material.LEATHER_BOOTS)
                         .meta(LeatherArmorMeta.class, leatherArmorMeta -> {
-                            leatherArmorMeta.color(PURPLE_COLOR);
+                            leatherArmorMeta.color(BLACk_COLOR);
                         }).build()
         );
 
-        setItemInMainHand(ItemStack.of(Material.IRON_HOE));
+        setItemInMainHand(ItemStack.of(Material.NETHERITE_HOE));
 
         addAIGroup(
                 new EntityAIGroupBuilder()

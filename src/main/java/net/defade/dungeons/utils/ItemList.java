@@ -147,4 +147,11 @@ public class ItemList {
                 playerHeadMeta.playerSkin(new PlayerSkin("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3" +
                         "RleHR1cmUvOTAxNGJmOGY2YjAyMDlkZGYwOTNmMWQ1YTA3YjgwNzViMzczMmFhYjI0NjJkYTA3Njc2MmRjZDI1MGIxZTU1YSJ9fX0=", ""));
             }).build();
+
+    public static ItemStack ENDER_CORRUPTED_HEAD = ItemStack.builder(Material.PLAYER_HEAD)
+            .meta(PlayerHeadMeta.class, playerHeadMeta -> {
+                playerHeadMeta.skullOwner(UUID.randomUUID());
+                playerHeadMeta.playerSkin(new PlayerSkin("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3Rle" +
+                        "HR1cmUvMjNjMGU0YzE0MmI3NGIxMTY2ZmYwZjllNWMxMTVhOWZhYTE0Y2ExYzUyZDY0M2ZiNjhjYmMzMmI4MzUxY2MyOSJ9fX0=", ""));
+            }).build();
 }

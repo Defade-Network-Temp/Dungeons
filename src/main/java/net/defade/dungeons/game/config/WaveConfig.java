@@ -6,6 +6,7 @@ import net.defade.dungeons.zombies.classic.ZombieI;
 import net.defade.dungeons.zombies.classic.ZombieII;
 import net.defade.dungeons.zombies.classic.ZombieIII;
 import net.defade.dungeons.zombies.classic.ZombieIV;
+import net.defade.dungeons.zombies.classic.ZombieIX;
 import net.defade.dungeons.zombies.classic.ZombieV;
 import net.defade.dungeons.zombies.classic.ZombieVI;
 import net.defade.dungeons.zombies.classic.ZombieVII;
@@ -51,6 +52,7 @@ public class WaveConfig {
             case "level6" -> ZombieVI.class;
             case "level7" -> ZombieVII.class;
             case "level8" -> ZombieVIII.class;
+            case "level9" -> ZombieIX.class;
             default -> throw new IllegalArgumentException("The zombie " + zombieName + " does not exists.");
         };
     }
