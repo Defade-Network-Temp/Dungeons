@@ -133,4 +133,18 @@ public class ItemList {
                         "QubmV0L3RleHR1cmUvZWE5OWYxYmQ1MWI1ZDMzYjg1YWVhZTVhN2NmZDU0ZGI2MGQyNWY5ZmRlMGJkODkzZmQ5NDliYmZhM2Q4ZDc3MSJ9fX0=", ""));
             })
             .build();
+
+    public static ItemStack SEMI_CORRUPTED_HEAD = ItemStack.builder(Material.PLAYER_HEAD)
+            .meta(PlayerHeadMeta.class, playerHeadMeta -> {
+                playerHeadMeta.skullOwner(UUID.randomUUID());
+                playerHeadMeta.playerSkin(new PlayerSkin("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV" +
+                        "0L3RleHR1cmUvZWM5NmI1ZWFlYzU3ZDQ3YTUwYWZiZjY4NDQyOTNmODgxNTEwZjhkYWI0NmQ1ZmYzMjY4N2U5ZWNiMDhlMTFiNSJ9fX0=", ""));
+            }).build();
+
+    public static ItemStack CORRUPTED_HEAD = ItemStack.builder(Material.PLAYER_HEAD)
+            .meta(PlayerHeadMeta.class, playerHeadMeta -> {
+                playerHeadMeta.skullOwner(UUID.randomUUID());
+                playerHeadMeta.playerSkin(new PlayerSkin("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3" +
+                        "RleHR1cmUvOTAxNGJmOGY2YjAyMDlkZGYwOTNmMWQ1YTA3YjgwNzViMzczMmFhYjI0NjJkYTA3Njc2MmRjZDI1MGIxZTU1YSJ9fX0=", ""));
+            }).build();
 }
