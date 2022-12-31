@@ -7,6 +7,7 @@ import net.defade.dungeons.zombies.classic.ZombieIII;
 import net.defade.dungeons.zombies.classic.ZombieIV;
 import net.defade.dungeons.zombies.classic.ZombieV;
 import net.defade.dungeons.zombies.classic.ZombieVI;
+import net.defade.dungeons.zombies.classic.ZombieVII;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -26,6 +27,7 @@ public class Wave {
         if(zombieClass == ZombieIV.class) return new ZombieIV();
         if(zombieClass == ZombieV.class) return new ZombieV();
         if(zombieClass == ZombieVI.class) return new ZombieVI();
+        if(zombieClass == ZombieVII.class) return new ZombieVII();
         throw new NoSuchElementException("The class " + zombieClass.getCanonicalName() + " has no supplier.");
     }
 
