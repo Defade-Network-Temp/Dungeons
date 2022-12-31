@@ -48,6 +48,8 @@ public class GameManager {
     private void createGame() {
         GameInstance gameInstance = new GameInstance(this);
         MinecraftServer.getInstanceManager().registerInstance(gameInstance);
+        gameInstance.postInit();
+
         gameInstances.add(gameInstance);
     }
 

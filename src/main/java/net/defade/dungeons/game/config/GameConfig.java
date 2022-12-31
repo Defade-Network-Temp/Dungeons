@@ -2,7 +2,10 @@ package net.defade.dungeons.game.config;
 
 import net.defade.dungeons.difficulty.Difficulty;
 import net.defade.dungeons.difficulty.GameDifficulty;
+import net.defade.dungeons.game.config.map.RoomConfig;
+import net.defade.dungeons.game.config.map.door.DoorConfig;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.instance.Instance;
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +13,8 @@ import java.util.Map;
 public class GameConfig {
     private final JSONObject jsonConfig;
     private final Pos spawnPoint;
+    private final RoomConfig roomConfig;
+    private final DoorConfig doorConfig;
 
     private final Map<Difficulty, Float> spawnMultiplier = new HashMap<>();
     private final Map<Difficulty, Float> damageMultiplier = new HashMap<>();
@@ -17,10 +22,11 @@ public class GameConfig {
     private final Map<Difficulty, Float> priceMultiplier = new HashMap<>();
     private final Map<Difficulty, Integer> weaponDifficultyReducer = new HashMap<>();
 
-    public GameConfig(String config) {
+    public GameConfig(String config, Instance instance) {
         jsonConfig = new JSONObject(config);
-
         spawnPoint = getPos(jsonConfig.getJSONObject("spawn"));
+        this.roomConfig = new RoomConfig(jsonConfig.getJSONObject("rooms"));
+        this.doorConfig = new DoorConfig(instance, roomConfig, jsonConfig.getJSONObject("doors"));
 
         JSONObject spawnMultiplierObject = jsonConfig.getJSONObject("SpawnMultiplier");
         for(Difficulty difficulty : Difficulty.values()) {
@@ -60,6 +66,14 @@ public class GameConfig {
 
     public WaveConfig getWaveConfig(Difficulty difficulty) {
         return new WaveConfig(jsonConfig.getJSONArray("waves"), spawnMultiplier.get(difficulty));
+    }
+
+    public RoomConfig getRoomConfig() {
+        return roomConfig;
+    }
+
+    public DoorConfig getDoorConfig() {
+        return doorConfig;
     }
 
     private static Pos getPos(JSONObject jsonObject) {

@@ -2,6 +2,7 @@ package net.defade.dungeons.game;
 
 import net.defade.dungeons.difficulty.Difficulty;
 import net.defade.dungeons.difficulty.GameDifficulty;
+import net.defade.dungeons.map.doors.DoorsManager;
 import net.defade.dungeons.game.config.GameConfig;
 import net.defade.dungeons.game.utils.AmethystMapSource;
 import net.defade.dungeons.pvp.FightHandler;
@@ -33,6 +34,7 @@ public class GameInstance extends InstanceContainer {
     private GameDifficulty difficulty;
 
     private WaveManager waveManager;
+    private final DoorsManager doorsManager;
     private final FightHandler fightHandler = new FightHandler(this);
     private final CoinsManager coinsManager = new CoinsManager();
 
@@ -71,6 +73,10 @@ public class GameInstance extends InstanceContainer {
         new GameStartManager(this);
     }
 
+    public void postInit() { // This method is called AFTER the instance has been registered.
+        config.getDoorConfig().initDoors();
+    }
+
     public boolean canAcceptPlayers() {
         return acceptsPlayers;
     }
@@ -81,6 +87,7 @@ public class GameInstance extends InstanceContainer {
 
     public void finishGame() {
         waveManager.stop();
+        doorsManager.stop();
         fightHandler.stop();
     }
 
@@ -96,6 +103,7 @@ public class GameInstance extends InstanceContainer {
         getPlayers().forEach(player -> Swords.equipSwordForPlayer(player, Swords.WOODEN_SWORD));
         getPlayers().forEach(Armors.NOTHING::equipForPlayer);
 
+        doorsManager.init();
         waveManager = new WaveManager(this, config.getWaveConfig(difficulty).getWaves());
         fightHandler.init();
     }
